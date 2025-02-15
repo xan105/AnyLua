@@ -19,30 +19,6 @@ std::wstring Getenv(LPCWSTR name) {
     }
 }
 
-std::wstring GetCurrentProcessDir() {
-    TCHAR buffer[MAX_PATH] = { 0 };
-    GetModuleFileNameW(NULL, buffer, MAX_PATH);
-
-    std::wstring path(buffer);
-    std::wstring::size_type pos = path.find_last_of(L"\\/");
-    if (pos != std::wstring::npos) {
-        path = path.substr(0, pos + 1);  // Keep trailing slash for easy path concat
-    }
-    return path;
-}
-
-std::wstring GetCurrentProcessName() {
-    TCHAR buffer[MAX_PATH] = { 0 };
-    GetModuleFileNameW(NULL, buffer, MAX_PATH);
-
-    std::wstring path(buffer);
-    std::wstring::size_type pos = path.find_last_of(L"\\");
-    if (pos != std::wstring::npos) {
-        path = path.substr(pos + 1);
-    }
-    return path;
-}
-
 std::wstring toWString(const std::string& s) {
     int size = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), (int)s.length(), nullptr, 0);
     std::wstring buf(size, L'\0');

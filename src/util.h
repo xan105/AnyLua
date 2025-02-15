@@ -9,8 +9,6 @@ found in the LICENSE file in the root directory of this source tree.
 #include <string>
 
 std::wstring Getenv(LPCWSTR name);
-std::wstring GetCurrentProcessDir();
-std::wstring GetCurrentProcessName();
 std::wstring toWString(const std::string& s);
 int toInt(size_t val);
 std::string toString(const std::wstring& s);
