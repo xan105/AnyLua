@@ -5,7 +5,8 @@ found in the LICENSE file in the root directory of this source tree.
 */
 
 #include "process.h"
-#include "../../util.h"
+#include "../../../util/string.h"
+#include "../../../util/util.h"
 
 std::wstring GetCurrentProcessDir() {
     TCHAR buffer[MAX_PATH] = { 0 };

@@ -5,12 +5,17 @@ found in the LICENSE file in the root directory of this source tree.
 */
 
 #include "dllmain.h"
-#include "util.h"
+#include "util/string.h"
+#include "util/util.h"
 
 //Extend LUA API
-#include "LUA/globals.h"
-#include "LUA/process/process.h"
-#include "LUA/memory/memory.h"
+//Global
+#include "lua/global/sleep.h"
+#include "lua/global/console.h"
+#include "lua/global/array.h"
+//Module
+#include "lua/module/process/process.h"
+#include "lua/module/memory/memory.h"
 
 lua_State* L = NULL;
 
@@ -59,7 +64,9 @@ DWORD WINAPI Main(LPVOID lpReserved) {
     L = luaL_newstate();
     load_std_libs(L);
     //Extend Globals
-    lua_register(L, "sleep", lua_sleep);
+    register_sleep(L);
+    register_console(L);
+    register_array(L);
     //Custom LUA module
     preloadModule(L, "process", luaopen_process);
     preloadModule(L, "memory", luaopen_memory);

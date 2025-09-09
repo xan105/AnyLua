@@ -18,30 +18,51 @@
     <ClCompile Include="..\src\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\util.cpp">
+    <ClCompile Include="..\src\util\string.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LUA\memory\memory.cpp">
+    <ClCompile Include="..\src\util\util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LUA\globals.cpp">
+    <ClCompile Include="..\src\lua\global\console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\LUA\process\process.cpp">
+    <ClCompile Include="..\src\lua\global\sleep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\module\process\process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\global\array.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\module\memory\memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\util.h">
+    <ClInclude Include="..\src\dllmain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\LUA\memory\memory.h">
+    <ClInclude Include="..\src\util\string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\LUA\globals.h">
+    <ClInclude Include="..\src\util\util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\LUA\process\process.h">
+    <ClInclude Include="..\src\lua\global\console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\global\sleep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\module\process\process.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\global\array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\module\memory\memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

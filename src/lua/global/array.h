@@ -12,5 +12,7 @@ extern "C" {
   #include <lualib.h>
 }
 
-static int findAddress(lua_State* L);
-LUALIB_API int luaopen_memory(lua_State* L);
+static int find(lua_State* L);
+static int some(lua_State* L);
+static int includes(lua_State* L);
+void register_array(lua_State* L);

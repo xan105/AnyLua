@@ -20,16 +20,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\dllmain.cpp" />
-    <ClCompile Include="..\src\LUA\globals.cpp" />
-    <ClCompile Include="..\src\LUA\memory\memory.cpp" />
-    <ClCompile Include="..\src\LUA\process\process.cpp" />
-    <ClCompile Include="..\src\util.cpp" />
+    <ClCompile Include="..\src\lua\global\array.cpp" />
+    <ClCompile Include="..\src\lua\global\console.cpp" />
+    <ClCompile Include="..\src\lua\global\sleep.cpp" />
+    <ClCompile Include="..\src\lua\module\memory\memory.cpp" />
+    <ClCompile Include="..\src\lua\module\process\process.cpp" />
+    <ClCompile Include="..\src\util\string.cpp" />
+    <ClCompile Include="..\src\util\util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\LUA\globals.h" />
-    <ClInclude Include="..\src\LUA\memory\memory.h" />
-    <ClInclude Include="..\src\LUA\process\process.h" />
-    <ClInclude Include="..\src\util.h" />
+    <ClInclude Include="..\src\dllmain.h" />
+    <ClInclude Include="..\src\lua\global\array.h" />
+    <ClInclude Include="..\src\lua\global\console.h" />
+    <ClInclude Include="..\src\lua\global\sleep.h" />
+    <ClInclude Include="..\src\lua\module\memory\memory.h" />
+    <ClInclude Include="..\src\lua\module\process\process.h" />
+    <ClInclude Include="..\src\util\string.h" />
+    <ClInclude Include="..\src\util\util.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
