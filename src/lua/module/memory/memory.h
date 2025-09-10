@@ -11,21 +11,20 @@ extern "C" {
   #include <lauxlib.h>
   #include <lualib.h>
 }
-#include <vector>
 #include <string>
-#include <stdexcept>
+#include <vector>
 #include <algorithm>
+#include <iterator>
 #include <cctype>
+#include <stdexcept>
 #include <psapi.h>
 
 namespace Memory {
-	bool Patch(uintptr_t address, const std::vector<BYTE>& patch, HANDLE hProcess);
-	uintptr_t FindPattern(uintptr_t baseAddress, size_t sizeOfImage, const std::vector<int>& pattern);
+  bool Patch(uintptr_t address, const std::vector<BYTE>& patch, HANDLE hProcess);
+  uintptr_t FindPattern(uintptr_t baseAddress, size_t sizeOfImage, const std::vector<int>& pattern);
+  template <typename T> std::vector<T> ParseHexStringTo(const std::string& input);
 }
 
-std::vector<int> ParsePattern(std::string& pattern);
-std::vector<BYTE> ParseValue(std::string& value);
-bool ApplyPatch(const MODULEINFO* moduleInfo, std::string& patternStr, std::size_t offset, std::string& valueStr);
-
-static int ApplyPatches(lua_State* L);
+int patch(lua_State* L);
+int find(lua_State* L);
 LUALIB_API int luaopen_memory(lua_State* L);

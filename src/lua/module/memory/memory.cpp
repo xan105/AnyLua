@@ -5,7 +5,6 @@ found in the LICENSE file in the root directory of this source tree.
 */
 
 #include "memory.h"
-#include <iostream>
 
 namespace Memory {
 
@@ -76,9 +75,8 @@ namespace Memory {
     return 0;
   }
 
-  template <typename T>
-  std::vector<T> ParseHexStringTo(const std::string& input) {
-
+  template <typename T> std::vector<T> ParseHexStringTo(const std::string& input) 
+  {
       std::string hex;
       hex.reserve(input.size());
       // Remove whitespace
