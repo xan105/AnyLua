@@ -8,28 +8,32 @@ found in the LICENSE file in the root directory of this source tree.
 #include "../../../util/string.h"
 #include "../../../util/util.h"
 
-std::wstring GetCurrentProcessDir() {
-    TCHAR buffer[MAX_PATH] = { 0 };
-    GetModuleFileNameW(NULL, buffer, MAX_PATH);
+namespace Process {
+  std::wstring GetCurrentProcessDir() 
+  {
+      TCHAR buffer[MAX_PATH] = { 0 };
+      GetModuleFileNameW(NULL, buffer, MAX_PATH);
 
-    std::wstring path(buffer);
-    std::wstring::size_type pos = path.find_last_of(L"\\/");
-    if (pos != std::wstring::npos) {
-        path = path.substr(0, pos + 1);  // Keep trailing slash for easy path concat
-    }
-    return path;
-}
+      std::wstring path(buffer);
+      std::wstring::size_type pos = path.find_last_of(L"\\/");
+      if (pos != std::wstring::npos) {
+          path = path.substr(0, pos + 1);  // Keep trailing slash for easy path concat
+      }
+      return path;
+  }
 
-std::wstring GetCurrentProcessName() {
-    TCHAR buffer[MAX_PATH] = { 0 };
-    GetModuleFileNameW(NULL, buffer, MAX_PATH);
+  std::wstring GetCurrentProcessName() 
+  {
+      TCHAR buffer[MAX_PATH] = { 0 };
+      GetModuleFileNameW(NULL, buffer, MAX_PATH);
 
-    std::wstring path(buffer);
-    std::wstring::size_type pos = path.find_last_of(L"\\");
-    if (pos != std::wstring::npos) {
-        path = path.substr(pos + 1);
-    }
-    return path;
+      std::wstring path(buffer);
+      std::wstring::size_type pos = path.find_last_of(L"\\");
+      if (pos != std::wstring::npos) {
+          path = path.substr(pos + 1);
+      }
+      return path;
+  }
 }
 
 static int exit(lua_State* L) {
@@ -68,10 +72,10 @@ LUALIB_API int luaopen_process(lua_State* L) {
     lua_pushinteger(L, GetCurrentProcessId());  
     lua_setfield(L, -2, "pid");
 
-    lua_pushstring(L, toString(GetCurrentProcessName()).c_str());
+    lua_pushstring(L, toString(Process::GetCurrentProcessName()).c_str());
     lua_setfield(L, -2, "name");
     
-    lua_pushstring(L, toString(GetCurrentProcessDir()).c_str());
+    lua_pushstring(L, toString(Process::GetCurrentProcessDir()).c_str());
     lua_setfield(L, -2, "dir");
 
     return 1;
