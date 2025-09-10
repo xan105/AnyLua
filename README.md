@@ -34,11 +34,11 @@ local patch = {
 function apply(patch)
   local address, err = memory.Find(patch.pattern)
   if err then
-    error(err)
+    error(err.message)
   end
   local success, err = memory.Patch(address + patch.offset, patch.value)
   if err then
-    error(err)
+    error(err.message)
   end
   return success
 end

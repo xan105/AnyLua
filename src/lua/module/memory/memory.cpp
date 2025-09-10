@@ -5,6 +5,7 @@ found in the LICENSE file in the root directory of this source tree.
 */
 
 #include "memory.h"
+#include "../../type/failure.h"
 
 namespace Memory {
 
@@ -120,13 +121,15 @@ int patch(lua_State* L) {
     }
     catch (std::invalid_argument error) {
         lua_pushboolean(L, false);
-        lua_pushstring(L, error.what());
+        lua_pushFailure(L, "ERR_INVALID_ARGUMENT", error.what());
         return 2;
     }
 
     if (!Memory::Patch(address, value)) {
+        std::ostringstream error;
+        error << "Fail to patch memory at address 0x" << std::hex << address;
         lua_pushboolean(L, false);
-        lua_pushstring(L, "Failed to patch");
+        lua_pushFailure(L, "ERR_WIN32_API", error.str().c_str());
         return 2;
     }
 
@@ -144,7 +147,7 @@ int find(lua_State* L) {
     }
     catch (std::invalid_argument error) {
         lua_pushinteger(L, 0);
-        lua_pushstring(L, error.what());
+        lua_pushFailure(L, "ERR_INVALID_ARGUMENT", error.what());
         return 2;
     }
     
@@ -152,7 +155,7 @@ int find(lua_State* L) {
     HANDLE processHandle = GetCurrentProcess();
     if (!GetModuleInformation(processHandle, GetModuleHandle(NULL), &moduleInfo, sizeof(moduleInfo))) {
         lua_pushinteger(L, 0);
-        lua_pushstring(L, "Failed to get current process handle");
+        lua_pushFailure(L, "ERR_WIN32_API", "Failed to get current process handle");
         return 2;
     }
 
@@ -160,7 +163,7 @@ int find(lua_State* L) {
     uintptr_t address = Memory::FindPattern(baseAddress, moduleInfo.SizeOfImage, pattern);
     if (!address) {
         lua_pushinteger(L, 0);
-        lua_pushstring(L, "No pattern found");
+        lua_pushFailure(L, "ERR_WIN32_API", "No Pattern found");
         return 2;
     }
 

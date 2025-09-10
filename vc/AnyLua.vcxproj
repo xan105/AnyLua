@@ -25,6 +25,7 @@
     <ClCompile Include="..\src\lua\global\sleep.cpp" />
     <ClCompile Include="..\src\lua\module\memory\memory.cpp" />
     <ClCompile Include="..\src\lua\module\process\process.cpp" />
+    <ClCompile Include="..\src\lua\type\failure.cpp" />
     <ClCompile Include="..\src\util\string.cpp" />
     <ClCompile Include="..\src\util\util.cpp" />
   </ItemGroup>
@@ -35,6 +36,7 @@
     <ClInclude Include="..\src\lua\global\sleep.h" />
     <ClInclude Include="..\src\lua\module\memory\memory.h" />
     <ClInclude Include="..\src\lua\module\process\process.h" />
+    <ClInclude Include="..\src\lua\type\failure.h" />
     <ClInclude Include="..\src\util\string.h" />
     <ClInclude Include="..\src\util\util.h" />
   </ItemGroup>

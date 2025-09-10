@@ -9,6 +9,8 @@ found in the LICENSE file in the root directory of this source tree.
 #include "util/util.h"
 
 //Extend LUA API
+//Type
+#include "lua/type/failure.h"
 //Global
 #include "lua/global/sleep.h"
 #include "lua/global/console.h"
@@ -63,6 +65,9 @@ DWORD WINAPI Main(LPVOID lpReserved) {
     
     L = luaL_newstate();
     load_std_libs(L);
+    
+    //Custom Type
+    register_failure(L);
     //Extend Globals
     register_sleep(L);
     register_console(L);
