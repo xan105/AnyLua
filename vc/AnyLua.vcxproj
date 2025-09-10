@@ -25,6 +25,7 @@
     <ClCompile Include="..\src\lua\global\sleep.cpp" />
     <ClCompile Include="..\src\lua\module\audio\audio.cpp" />
     <ClCompile Include="..\src\lua\module\dialog\dialog.cpp" />
+    <ClCompile Include="..\src\lua\module\gamepad\xinput.cpp" />
     <ClCompile Include="..\src\lua\module\memory\memory.cpp" />
     <ClCompile Include="..\src\lua\module\process\process.cpp" />
     <ClCompile Include="..\src\lua\type\failure.cpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="..\src\lua\global\sleep.h" />
     <ClInclude Include="..\src\lua\module\audio\audio.h" />
     <ClInclude Include="..\src\lua\module\dialog\dialog.h" />
+    <ClInclude Include="..\src\lua\module\gamepad\xinput.h" />
     <ClInclude Include="..\src\lua\module\memory\memory.h" />
     <ClInclude Include="..\src\lua\module\process\process.h" />
     <ClInclude Include="..\src\lua\type\failure.h" />

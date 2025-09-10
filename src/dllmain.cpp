@@ -20,6 +20,7 @@ found in the LICENSE file in the root directory of this source tree.
 #include "lua/module/memory/memory.h"
 #include "lua/module/dialog/dialog.h"
 #include "lua/module/audio/audio.h"
+#include "lua/module/gamepad/xinput.h"
 
 lua_State* L = NULL;
 
@@ -82,6 +83,7 @@ DWORD WINAPI Main(LPVOID lpReserved) {
     preloadModule(L, "memory", luaopen_memory);
     preloadModule(L, "dialog", luaopen_dialog);
     preloadModule(L, "audio", luaopen_audio);
+    preloadModule(L, "gamepad/xinput", luaopen_gamepad_xinput);
 
     //Load and run main lua file
     std::wstring lua_file = Getenv(L"LUA_FILEPATH");
