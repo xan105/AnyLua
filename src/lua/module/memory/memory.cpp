@@ -75,111 +75,107 @@ namespace Memory {
     }
     return 0;
   }
-}
 
-std::vector<int> ParsePattern(std::string& pattern) {
-    pattern.erase(std::remove_if(pattern.begin(), pattern.end(), ::isspace), pattern.end());
+  template <typename T>
+  std::vector<T> ParseHexStringTo(const std::string& input) {
 
-    if (pattern.size() % 2 != 0) 
-        throw std::invalid_argument("Pattern must have an even number of characters");
+      std::string hex;
+      hex.reserve(input.size());
+      // Remove whitespace
+      std::remove_copy_if(input.begin(), input.end(), std::back_inserter(hex), [](unsigned char c) { return std::isspace(c); });
 
-    std::vector<int> result;
-    for (size_t i = 0; i < pattern.size(); i += 2) {
-        char high = pattern[i];
-        char low = pattern[i+1];
+      if (hex.size() % 2 != 0) throw std::invalid_argument("Input must have an even number of characters");
 
-        if (high == '?' && low == '?') {
-            result.push_back(-1); // wildcard
-        } else if (std::isxdigit(high) && std::isxdigit(low)) {
-            int byte = std::stoi(pattern.substr(i, 2), nullptr, 16);
-            result.push_back(byte);
-        } else {
-            throw std::invalid_argument("Pattern contains invalid characters");
-        }
-    }
-    return result;
-}
+      std::vector<T> result;
+      result.reserve(hex.size() / 2);
 
-std::vector<BYTE> ParseValue(std::string& value) {
-    value.erase(std::remove_if(value.begin(), value.end(), ::isspace), value.end());
-    if (value.size() % 2 != 0)
-        throw std::invalid_argument("Value must have an even number of characters");
+      for (size_t i = 0; i < hex.size(); i += 2) {
+          char high = hex[i];
+          char low = hex[i + 1];
 
-    std::vector<BYTE> result;
-    for (size_t i = 0; i < value.size(); i += 2) {
-        char high = value[i];
-        char low = value[i+1];
-
-        if (std::isxdigit(high) && std::isxdigit(low)) {
-            BYTE byte = static_cast<BYTE>(std::stoi(value.substr(i, 2), nullptr, 16));
-            result.push_back(byte);
-        } else {
-            throw std::invalid_argument("Value contains invalid characters");
-        }
-    }
-    return result;
-}
-
-bool ApplyPatch(const MODULEINFO* moduleInfo, std::string& patternStr, std::size_t offset, std::string& valueStr) {
-
-  std::vector<int> pattern = ParsePattern(patternStr);
-  std::vector<BYTE> value = ParseValue(valueStr);
-
-  uintptr_t baseAddress = reinterpret_cast<uintptr_t>(moduleInfo->lpBaseOfDll);
-  uintptr_t found = Memory::FindPattern(baseAddress, moduleInfo->SizeOfImage, pattern);
-  if (!found) {
-    return false;
+          if (high == '?' && low == '?') {
+              if constexpr (std::is_same_v<T, int>) {
+                  result.push_back(-1); // wildcard marker
+              }
+              else {
+                  throw std::invalid_argument("Wildcard not supported! Wrong type?");
+              }
+          }
+          else if (std::isxdigit(high) && std::isxdigit(low)) {
+              int byte = std::stoi(hex.substr(i, 2), nullptr, 16);
+              result.push_back(static_cast<T>(byte));
+          }
+          else {
+              throw std::invalid_argument("Input contains invalid characters");
+          }
+      }
+      return result;
   }
-
-  return Memory::Patch(found + offset, value);
 }
 
-static int ApplyPatches(lua_State* L) {
-    if (!lua_istable(L, 1))
-        return luaL_error(L, "Expected a table of patches");
-
-    lua_pushnil(L);
-    while (lua_next(L, 1) != 0) {
-        if (!lua_istable(L, -1)) {
-            lua_pop(L, 1);
-            continue;
-        }
-
-        lua_getfield(L, -1, "pattern");
-        lua_getfield(L, -2, "offset");
-        lua_getfield(L, -3, "value");
-        lua_getfield(L, -4, "required");
-
-        if (!lua_isstring(L, -4) || !lua_isnumber(L, -3) || !lua_isstring(L, -2)) {
-            lua_pop(L, 4);
-            lua_pop(L, 1);
-            continue;
-        }
-
-        std::string pattern = lua_tostring(L, -4);
-        std::size_t offset = static_cast<std::size_t>(lua_tointeger(L, -3));
-        std::string value = lua_tostring(L, -2);
-        bool required = lua_isboolean(L, -1) ? lua_toboolean(L, -1) : false;
-        lua_pop(L, 4);
-        
-        MODULEINFO moduleInfo;
-        HANDLE processHandle = GetCurrentProcess();
-        if (!GetModuleInformation(processHandle, GetModuleHandle(NULL), &moduleInfo, sizeof(moduleInfo)))
-          return luaL_error(L, "Failed to get current process handle");
-
-        bool success = ApplyPatch(&moduleInfo, pattern, offset, value);
-        if (!success && required) {
-            return luaL_error(L, "Required patch failed: pattern='%s', offset=0x%zx", pattern.c_str(), offset);
-        }
-        lua_pop(L, 1);
+int patch(lua_State* L) {
+    uintptr_t address = static_cast<uintptr_t>(luaL_checkinteger(L, 1));
+    std::string valueStr = luaL_checkstring(L, 2);
+    std::vector<BYTE> value;
+    try {
+        value = Memory::ParseHexStringTo<BYTE>(valueStr);
     }
-    return 0;
+    catch (std::invalid_argument error) {
+        lua_pushboolean(L, false);
+        lua_pushstring(L, error.what());
+        return 2;
+    }
+
+    if (!Memory::Patch(address, value)) {
+        lua_pushboolean(L, false);
+        lua_pushstring(L, "Failed to patch");
+        return 2;
+    }
+
+    lua_pushboolean(L, true);
+    lua_pushnil(L);
+    return 2;
+}
+
+
+int find(lua_State* L) {
+    std::string patternStr = luaL_checkstring(L, 1);
+    std::vector<int> pattern = {};
+    try {
+        pattern = Memory::ParseHexStringTo<int>(patternStr);
+    }
+    catch (std::invalid_argument error) {
+        lua_pushinteger(L, 0);
+        lua_pushstring(L, error.what());
+        return 2;
+    }
+    
+    MODULEINFO moduleInfo;
+    HANDLE processHandle = GetCurrentProcess();
+    if (!GetModuleInformation(processHandle, GetModuleHandle(NULL), &moduleInfo, sizeof(moduleInfo))) {
+        lua_pushinteger(L, 0);
+        lua_pushstring(L, "Failed to get current process handle");
+        return 2;
+    }
+
+    uintptr_t baseAddress = reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll);
+    uintptr_t address = Memory::FindPattern(baseAddress, moduleInfo.SizeOfImage, pattern);
+    if (!address) {
+        lua_pushinteger(L, 0);
+        lua_pushstring(L, "No pattern found");
+        return 2;
+    }
+
+    lua_pushinteger(L, address);
+    lua_pushnil(L);
+    return 2; 
 }
 
 LUALIB_API int luaopen_memory(lua_State* L) {
 
     const struct luaL_Reg exports[] = {
-        {"applyPatches", ApplyPatches},
+        {"Patch", patch},
+        {"Find", find},
         { NULL, NULL }
     };
 

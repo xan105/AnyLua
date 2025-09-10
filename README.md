@@ -25,16 +25,27 @@ No Man's Sky: Remove the "Mod Enabled" Warning screen on startup
 ```lua
 local memory = require("memory")
 
-local patches = {
-  { 
+local patch = { 
     pattern = "48 8B 01 48 85 C0 74 08 0F B6 80 5A 46 00 00 C3", 
     offset = 0x06, 
-    value = "EB", 
-    required = true,
-  },
+    value = "EB",
 }
 
-memory.applyPatches(patches)
+function apply(patch)
+  local address, err = memory.Find(patch.pattern)
+  if err then
+    error(err)
+  end
+  local success, err = memory.Patch(address + patch.offset, patch.value)
+  if err then
+    error(err)
+  end
+  return success
+end
+
+if apply(patch) then
+  console.log("Applied patch!)
+end
 ```
 
 Usage
