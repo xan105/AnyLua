@@ -112,24 +112,29 @@ namespace Memory {
   }
 }
 
-int patch(lua_State* L) {
+template <typename T> static T SafeRead(uintptr_t address) {
+    T value;
+    std::memcpy(&value, reinterpret_cast<void*>(address), sizeof(T));
+    return value;
+}
+
+int Write(lua_State* L) {
     uintptr_t address = static_cast<uintptr_t>(luaL_checkinteger(L, 1));
     std::string valueStr = luaL_checkstring(L, 2);
     std::vector<BYTE> value;
     try {
         value = Memory::ParseHexStringTo<BYTE>(valueStr);
     }
-    catch (std::invalid_argument error) {
+    catch (const std::exception& error) {
         lua_pushboolean(L, false);
         lua_pushFailure(L, "ERR_INVALID_ARGUMENT", error.what());
         return 2;
     }
 
     if (!Memory::Patch(address, value)) {
-        std::ostringstream error;
-        error << "Fail to patch memory at address 0x" << std::hex << address;
+        std::string message = "Fail to write memory at address " + std::to_string(address);
         lua_pushboolean(L, false);
-        lua_pushFailure(L, "ERR_WIN32_API", error.str().c_str());
+        lua_pushFailure(L, "ERR_WIN32_API", message.c_str());
         return 2;
     }
 
@@ -139,13 +144,13 @@ int patch(lua_State* L) {
 }
 
 
-int find(lua_State* L) {
+int Find(lua_State* L) {
     std::string patternStr = luaL_checkstring(L, 1);
     std::vector<int> pattern = {};
     try {
         pattern = Memory::ParseHexStringTo<int>(patternStr);
     }
-    catch (std::invalid_argument error) {
+    catch (const std::exception& error) {
         lua_pushinteger(L, 0);
         lua_pushFailure(L, "ERR_INVALID_ARGUMENT", error.what());
         return 2;
@@ -172,11 +177,82 @@ int find(lua_State* L) {
     return 2; 
 }
 
+int ReadAt(lua_State* L) {
+    uintptr_t address = static_cast<uintptr_t>(luaL_checkinteger(L, 1));
+    std::string typeStr = luaL_checkstring(L, 2);
+    size_t length = static_cast<size_t>(luaL_optinteger(L, 3, 256));
+
+    try {
+        if (typeStr == "INT8"){
+          lua_pushinteger(L, SafeRead<int8_t>(address));  
+          lua_pushnil(L);
+        }
+        else if (typeStr == "UINT8"){
+          lua_pushinteger(L, SafeRead<uint8_t>(address));
+          lua_pushnil(L);
+        }
+        else if (typeStr == "INT16"){
+          lua_pushinteger(L, SafeRead<int16_t>(address));
+          lua_pushnil(L);
+        }
+        else if (typeStr == "UINT16"){
+          lua_pushinteger(L, SafeRead<uint16_t>(address));
+          lua_pushnil(L);
+        }
+        else if (typeStr == "INT32"){
+          lua_pushinteger(L, SafeRead<int32_t>(address));
+          lua_pushnil(L);
+        }
+        else if (typeStr == "UINT32"){
+          lua_pushinteger(L, SafeRead<uint32_t>(address));
+          lua_pushnil(L);
+        }
+        else if (typeStr == "INT64"){
+          lua_pushinteger(L, SafeRead<int64_t>(address));
+          lua_pushnil(L);
+        }
+        else if (typeStr == "UINT64"){
+          lua_pushinteger(L, SafeRead<uint64_t>(address));
+          lua_pushnil(L);
+        }
+        else if (typeStr == "FLOAT"){
+          lua_pushnumber(L, SafeRead<float>(address));
+          lua_pushnil(L);
+        }
+        else if (typeStr == "DOUBLE"){
+          lua_pushnumber(L, SafeRead<double>(address));
+          lua_pushnil(L);
+        }
+        else if (typeStr == "POINTER"){
+          lua_pushinteger(L, SafeRead<uintptr_t>(address));
+          lua_pushnil(L);
+        }
+        else if (typeStr == "CSTRING"){
+          std::vector<char> buffer(length);
+          std::memcpy(buffer.data(), reinterpret_cast<const void*>(address), length);
+          std::string str(buffer.data(), strnlen(buffer.data(), length));
+          lua_pushstring(L, str.c_str());
+          lua_pushnil(L);
+        } else {
+          std::string message = "Unsupported type string: " + typeStr;
+          lua_pushnil(L);
+          lua_pushFailure(L, "ERR_INVALID_ARGUMENT", message.c_str());
+        }
+     } catch (...) {
+        std::string message = "Could not read value as type " + typeStr + " at address " + std::to_string(address);
+        lua_pushnil(L);
+        lua_pushFailure(L, "ERR_INVALID_ARGUMENT", message.c_str());
+     }
+
+    return 2;
+}
+
 LUALIB_API int luaopen_memory(lua_State* L) {
 
     const struct luaL_Reg exports[] = {
-        {"Patch", patch},
-        {"Find", find},
+        {"Write", Write},
+        {"Find", Find},
+        {"ReadAt", ReadAt},
         { NULL, NULL }
     };
 

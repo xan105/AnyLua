@@ -36,7 +36,7 @@ function apply(patch)
   if err then
     error(err.message)
   end
-  local success, err = memory.Patch(address + patch.offset, patch.value)
+  local success, err = memory.Write(address + patch.offset, patch.value)
   if err then
     error(err.message)
   end
