@@ -73,7 +73,7 @@ static std::string format(lua_State* L, int idx, int depth = 0) {
     return out.str();
 }
 
-std::string currentTimestamp() {
+static std::string currentTimestamp() {
     using namespace std::chrono;
     auto now = system_clock::now();
     std::time_t now_c = system_clock::to_time_t(now);
@@ -107,26 +107,26 @@ static int print(lua_State* L, const char* level, const char* color) {
     return 0;
 }
 
-static int log(lua_State* L) {
+int console_log(lua_State* L) {
     return print(L, "INFO", reset);
 }
-static int warn(lua_State* L) {
+int console_warn(lua_State* L) {
     return print(L, "WARN", yellow);
 }
-static int error(lua_State* L) {
+int console_error(lua_State* L) {
     return print(L, "ERROR", red);
 }
 
 void register_console(lua_State* L) {
     lua_newtable(L);
 
-    lua_pushcfunction(L, log);
+    lua_pushcfunction(L, console_log);
     lua_setfield(L, -2, "log");
 
-    lua_pushcfunction(L, warn);
+    lua_pushcfunction(L, console_warn);
     lua_setfield(L, -2, "warn");
 
-    lua_pushcfunction(L, error);
+    lua_pushcfunction(L, console_error);
     lua_setfield(L, -2, "error");
 
     lua_setglobal(L, "console");

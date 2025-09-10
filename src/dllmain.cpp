@@ -70,6 +70,9 @@ DWORD WINAPI Main(LPVOID lpReserved) {
     
     //Custom Type
     register_failure(L);
+    //Override built-in and alias it to console.log
+    lua_pushcfunction(L, console_log);
+    lua_setglobal(L, "print");
     //Extend Globals
     register_sleep(L);
     register_console(L);

@@ -35,7 +35,7 @@ static std::map<int, std::string> RESPONSES = {
     {IDTRYAGAIN, "TRYAGAIN"},
 };
 
-int Show(lua_State* L) {
+int DialogShow(lua_State* L) {
     if (!lua_istable(L, 1)) {
         return luaL_error(L, "Expected a table as argument");
     }
@@ -78,7 +78,7 @@ int Show(lua_State* L) {
 LUALIB_API int luaopen_dialog(lua_State* L) {
 
     const struct luaL_Reg exports[] = {
-        {"Show", Show},
+        {"Show", DialogShow},
         { NULL, NULL }
     };
 

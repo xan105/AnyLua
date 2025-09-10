@@ -112,7 +112,7 @@ namespace Memory {
   }
 }
 
-int Write(lua_State* L) {
+int MemoryWrite(lua_State* L) {
     uintptr_t address = static_cast<uintptr_t>(luaL_checkinteger(L, 1));
     std::string valueStr = luaL_checkstring(L, 2);
     std::vector<BYTE> value;
@@ -138,7 +138,7 @@ int Write(lua_State* L) {
 }
 
 
-int Find(lua_State* L) {
+int MemoryFind(lua_State* L) {
     std::string patternStr = luaL_checkstring(L, 1);
     std::vector<int> pattern = {};
     try {
@@ -177,7 +177,7 @@ template <typename T> static T SafeRead(uintptr_t address) {
     return value;
 }
 
-int ReadAt(lua_State* L) {
+int MemoryReadAt(lua_State* L) {
     uintptr_t address = static_cast<uintptr_t>(luaL_checkinteger(L, 1));
     std::string typeStr = luaL_checkstring(L, 2);
     size_t length = static_cast<size_t>(luaL_optinteger(L, 3, 256));
@@ -250,9 +250,9 @@ int ReadAt(lua_State* L) {
 LUALIB_API int luaopen_memory(lua_State* L) {
 
     const struct luaL_Reg exports[] = {
-        {"Write", Write},
-        {"Find", Find},
-        {"ReadAt", ReadAt},
+        {"Write", MemoryWrite},
+        {"Find", MemoryFind},
+        {"ReadAt", MemoryReadAt},
         { NULL, NULL }
     };
 

@@ -18,8 +18,9 @@ extern "C" {
 #include <iomanip>
 
 static std::string format(lua_State* L, int idx, int depth);
+static std::string currentTimestamp();
 static int print(lua_State* L, const char* level, const char* color);
-static int log(lua_State* L);
-static int warn(lua_State* L);
-static int error(lua_State* L);
+int console_log(lua_State* L);
+int console_warn(lua_State* L);
+int console_error(lua_State* L);
 void register_console(lua_State* L);

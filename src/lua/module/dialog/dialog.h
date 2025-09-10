@@ -14,5 +14,5 @@ extern "C" {
 #include <map>
 #include <string>
 
-int Show(lua_State* L);
+int DialogShow(lua_State* L);
 LUALIB_API int luaopen_dialog(lua_State* L);
