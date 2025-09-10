@@ -25,9 +25,8 @@ namespace Memory {
   template <typename T> std::vector<T> ParseHexStringTo(const std::string& input);
 }
 
-template <typename T> static T SafeRead(uintptr_t address);
-
-int Patch(lua_State* L);
+int Write(lua_State* L);
 int Find(lua_State* L);
+template <typename T> static T SafeRead(uintptr_t address);
 int ReadAt(lua_State* L);
 LUALIB_API int luaopen_memory(lua_State* L);

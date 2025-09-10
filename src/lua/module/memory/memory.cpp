@@ -112,12 +112,6 @@ namespace Memory {
   }
 }
 
-template <typename T> static T SafeRead(uintptr_t address) {
-    T value;
-    std::memcpy(&value, reinterpret_cast<void*>(address), sizeof(T));
-    return value;
-}
-
 int Write(lua_State* L) {
     uintptr_t address = static_cast<uintptr_t>(luaL_checkinteger(L, 1));
     std::string valueStr = luaL_checkstring(L, 2);
@@ -175,6 +169,12 @@ int Find(lua_State* L) {
     lua_pushinteger(L, address);
     lua_pushnil(L);
     return 2; 
+}
+
+template <typename T> static T SafeRead(uintptr_t address) {
+    T value;
+    std::memcpy(&value, reinterpret_cast<void*>(address), sizeof(T));
+    return value;
 }
 
 int ReadAt(lua_State* L) {

@@ -19,7 +19,7 @@ std::wstring Getenv(LPCWSTR name) {
     }
 }
 
-void enableConsole() {
+void EnableConsole() {
     if (AllocConsole()) {
         HWND consoleWindow = GetConsoleWindow();
         if (consoleWindow) {

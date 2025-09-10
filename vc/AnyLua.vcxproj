@@ -23,6 +23,8 @@
     <ClCompile Include="..\src\lua\global\array.cpp" />
     <ClCompile Include="..\src\lua\global\console.cpp" />
     <ClCompile Include="..\src\lua\global\sleep.cpp" />
+    <ClCompile Include="..\src\lua\module\audio\audio.cpp" />
+    <ClCompile Include="..\src\lua\module\dialog\dialog.cpp" />
     <ClCompile Include="..\src\lua\module\memory\memory.cpp" />
     <ClCompile Include="..\src\lua\module\process\process.cpp" />
     <ClCompile Include="..\src\lua\type\failure.cpp" />
@@ -34,6 +36,8 @@
     <ClInclude Include="..\src\lua\global\array.h" />
     <ClInclude Include="..\src\lua\global\console.h" />
     <ClInclude Include="..\src\lua\global\sleep.h" />
+    <ClInclude Include="..\src\lua\module\audio\audio.h" />
+    <ClInclude Include="..\src\lua\module\dialog\dialog.h" />
     <ClInclude Include="..\src\lua\module\memory\memory.h" />
     <ClInclude Include="..\src\lua\module\process\process.h" />
     <ClInclude Include="..\src\lua\type\failure.h" />

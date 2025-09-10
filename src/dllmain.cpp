@@ -18,6 +18,8 @@ found in the LICENSE file in the root directory of this source tree.
 //Module
 #include "lua/module/process/process.h"
 #include "lua/module/memory/memory.h"
+#include "lua/module/dialog/dialog.h"
+#include "lua/module/audio/audio.h"
 
 lua_State* L = NULL;
 
@@ -51,16 +53,16 @@ void load_std_libs(lua_State* L) {
 }
 
 void panic(lua_State *L) {
-    const char *error = lua_tostring(L, -1);
+    std::string error = lua_tostring(L, -1);
     std::cerr << "Lua error: " << error << std::endl;
-    MessageBoxA(NULL, error, "Lua Error", MB_ICONERROR | MB_OK);
+    MessageBoxA(NULL, error.c_str(), "AnyLua Error", MB_ICONERROR | MB_OK);
     ExitProcess(1);
 }
 
 DWORD WINAPI Main(LPVOID lpReserved) {
     
     #ifdef _DEBUG
-        enableConsole();
+        EnableConsole();
     #endif
     
     L = luaL_newstate();
@@ -75,6 +77,8 @@ DWORD WINAPI Main(LPVOID lpReserved) {
     //Custom LUA module
     preloadModule(L, "process", luaopen_process);
     preloadModule(L, "memory", luaopen_memory);
+    preloadModule(L, "dialog", luaopen_dialog);
+    preloadModule(L, "audio", luaopen_audio);
 
     //Load and run main lua file
     std::wstring lua_file = Getenv(L"LUA_FILEPATH");
