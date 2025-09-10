@@ -13,11 +13,12 @@ extern "C" {
   #include <lauxlib.h>
   #include <lualib.h>
 }
+#include <map>
 
 namespace Process {
   std::wstring GetCurrentProcessDir();
   std::wstring GetCurrentProcessName();
 }
-static int exit(lua_State* L);
-static int cmdLine(lua_State* L);
+static int Exit(lua_State* L);
+static int CmdLine(lua_State* L);
 LUALIB_API int luaopen_process(lua_State* L);

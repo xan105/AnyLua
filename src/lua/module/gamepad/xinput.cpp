@@ -8,7 +8,7 @@ found in the LICENSE file in the root directory of this source tree.
 
 int XInput_RumbleController(lua_State *L) {
 
-  int playerID = (int)luaL_checkinteger(L, 1);
+  int playerID = static_cast<int>(luaL_checkinteger(L, 1));
 
   XINPUT_VIBRATION vibration;
   ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
@@ -17,12 +17,12 @@ int XInput_RumbleController(lua_State *L) {
   
   if (lua_istable(L, 2)){
     lua_getfield(L, 2, "low");
-    int lowFrequencyPercent = (int)(luaL_optinteger(L, -1, 0));
+    int lowFrequencyPercent = static_cast<int>(luaL_optinteger(L, -1, 0));
     lowFrequencyPercent = std::clamp(lowFrequencyPercent, 0, 100);
     lua_pop(L, 1);
 
     lua_getfield(L, 2, "high");
-    int highFrequencyPercent = (int)(luaL_optinteger(L, -1, 0));
+    int highFrequencyPercent = static_cast<int>(luaL_optinteger(L, -1, 0));
     highFrequencyPercent = std::clamp(highFrequencyPercent, 0, 100);
     lua_pop(L, 1);
 
@@ -31,12 +31,12 @@ int XInput_RumbleController(lua_State *L) {
     }
     else
     {
-        int percent = (int)luaL_checkinteger(L, 2);
+        int percent = static_cast<int>(luaL_checkinteger(L, 2));
         percent = std::clamp(percent, 0, 100);
         vibration.wLeftMotorSpeed = vibration.wRightMotorSpeed = static_cast<WORD>(percent * 65535 / 100);
     }
     
-    DWORD durationMs = (DWORD)(luaL_optinteger(L, 3, 2500));
+    DWORD durationMs = static_cast<DWORD>(luaL_optinteger(L, 3, 2500));
 
     XInputSetState(playerID, &vibration);
     Sleep(durationMs);

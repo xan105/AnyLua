@@ -5,6 +5,7 @@ found in the LICENSE file in the root directory of this source tree.
 */
 
 #include "process.h"
+#include "../../type/failure.h"
 #include "../../../util/string.h"
 #include "../../../util/util.h"
 
@@ -36,18 +37,23 @@ namespace Process {
   }
 }
 
-static int exit(lua_State* L) {
+static int Exit(lua_State* L) {
     lua_Integer exitCode = luaL_checkinteger(L, 1);
     ExitProcess((UINT)exitCode);
     return 0;
 }
 
-static int cmdLine(lua_State* L) {
+static int CmdLine(lua_State* L) {
     int nArgs;
     LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &nArgs);
-    if (!argv) return luaL_error(L, "Failed to retrieve command line arguments");
+    
+    lua_createtable(L, nArgs, 0);
+    
+    if (!argv) {
+      lua_pushFailure(L, "ERR_WIN32_API", "Failed to retrieve command line arguments");
+      return 2;
+    }
 
-    lua_newtable(L);
     for (int i = 0; i < nArgs; i++) {
         std::string arg = toString(argv[i]);
         if (!arg.empty()) {
@@ -55,16 +61,36 @@ static int cmdLine(lua_State* L) {
             lua_rawseti(L, -2, i + 1);
         }
     }
-
     LocalFree(argv);
-    return 1;
+    
+    lua_pushnil(L);
+    return 2;
+}
+
+static int SetDpiAwareness(lua_State* L) {
+
+  std::map<std::string, DPI_AWARENESS_CONTEXT> AWARENESS = {
+      {"UNAWARE ", DPI_AWARENESS_CONTEXT_UNAWARE},
+      {"SYSTEM", DPI_AWARENESS_CONTEXT_SYSTEM_AWARE},
+      {"MONITOR", DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE},
+      {"MONITORv2", DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 },
+      {"GDISCALED", DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED },
+  };
+
+  std::string context = luaL_checkstring(L, 1);
+  if (AWARENESS.count(context)) {
+    SetThreadDpiAwarenessContext(AWARENESS.at(context));
+  }
+  
+  return 0;  
 }
 
 LUALIB_API int luaopen_process(lua_State* L) {
 
     const struct luaL_Reg exports[] = {
-        {"exit", exit},
-        {"cmdLine", cmdLine},
+        {"exit", Exit},
+        {"cmdLine", CmdLine},
+        {"SetDpiAwareness", SetDpiAwareness},
         { NULL, NULL }
     };
     luaL_newlib(L, exports);
