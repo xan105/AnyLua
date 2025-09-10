@@ -14,11 +14,16 @@ extern "C" {
   #include <lualib.h>
 }
 #include <map>
+#include <appmodel.h>
+#include <shobjidl.h>
 
 namespace Process {
   std::wstring GetCurrentProcessDir();
   std::wstring GetCurrentProcessName();
+  std::wstring GetAUMID();
 }
 static int Exit(lua_State* L);
 static int CmdLine(lua_State* L);
+static int SetDpiAwareness(lua_State* L);
+static int SetAUMID(lua_State* L);
 LUALIB_API int luaopen_process(lua_State* L);
