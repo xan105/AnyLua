@@ -131,6 +131,9 @@ binary.once("spawn", () => {
 LUA Scripting
 =============
 
+Very simple scripting engine powered by [LuaJIT](https://luajit.org/) (Lua 5.1).<br />
+See the `./example` directory for some examples.
+
 Standard libs available are:
 
   - Package
@@ -141,70 +144,81 @@ Standard libs available are:
   - bit (LuaJIT)
   
 Some standard libraries are not enabled by design.<br />
-The followings are exposed to the Lua VM, I might add more later on.
+The followings modules are exposed to the Lua VM, I might add more later on.
   
 ## 🌐 Globals
 
-### sleep(ms: number)
+### `sleep(ms: int)`
 
-Suspends the execution of the Lua engine until the time-out interval elapses.
+Suspends the execution of the Lua engine until the time-out interval elapses (interval is in milliseconds).
 
-- `ms: number`
-  Time interval in milliseconds.
+### `console: SetFuncs`
 
-```lua
-print("HELLO")
-sleep(1000)
-print("WORLD")
-```
-
-## 📦 Process
-
-```lua
-local process = require("process")
-```
-
-- `pid: number`
-- `name: string`
-- `dir: string`
-- `exit(code: number)`
-- `cmdLine() []string`
-
-### `pid: number`
-
-Process pid.
-
-### `name: string`
-
-Process executable name.
-
-### `dir: string`
-
-Process executable dir. 
-
-> [!TIP]
-> Not be confused with the process current working dir.
-
-### `exit(code: number)`
-
-Ends the process and all its threads.
-
-- `code: number`
-  The exit code for the process and all threads.
+  + `log(any, ...)`
+  + `warn(any, ...)`
+  + `error(any, ...)`
   
-### `cmdLine() []string`
+Convenience methods to print value or array with timestamp and log level. Values are colored depending on their type.
 
-Retrieves process command-line string as an argv style array of strings.
+💡 `print()` is an alias to `console.log()`
 
-## 📦 Memory
+### `Array: SetFuncs`
+
+  + `find(table, func) any`
+  + `some(table, func) bool`
+  + `includes(table, any) bool`
+  
+Convenience methods to search ~~array~~ Lua table.
+
+Example: 
 
 ```lua
-local memory = require("memory")
+local arr = {1, 2, 3, 4, 5}
+
+Array.find(arr, function(x) return x > 3 end)
+Array.includes(arr, 3)
+
+local arr = {
+  {foo = "bar", value = 1},
+  {foo = "baz", value = 2}
+}
+
+Array.find(arr, function(x) return x.foo == "bar" end)
+Array.some(arr, function(x) return x.foo == "baz" end)
 ```
 
-- pattern
-  + find()
-  + write()
+### `Failure(code?: string, message?: string) Failure{ code: string, message: string }`
+
+Failure is a custom type (_userdata_) that represents an "error object" with an associated error code and message.
+This provides a structured way to handle error.
+
+- `code?: string` ("ERR_UNKNOWN")
+  Error code.
+  
+- `message?: string` ("An unknown error occurred")
+  Error message.
+  
+💡 `Failure` has a `__tostring` metamethod. If not invoked automatically, you can explicitly call it using `tostring(Failure)`
+
+Example:
+
+```lua
+local err = Failure("ERR_NOT_FOUND", "The requested item was not found")
+print(err.code)    -- "ERR_NOT_FOUND"
+print(err.message) -- "The requested item was not found"
+print(err)         -- "[ERR_NOT_FOUND]: The requested item was not found"
+
+local value, err = Foo()
+if err and err.code == "ERR_UNKNOWN" then
+  error(err.message) -- Raise an error "An unknown error occurred"
+  -- or
+  error(tostring(err))
+end
+```
+
+## 📦 Modules
+
+
   
 Build
 =====
