@@ -35,20 +35,6 @@ namespace Process {
       }
       return path;
   }
-  
-  std::wstring GetAUMID()
-  {
-    UINT32 length = 0;
-    if (GetCurrentApplicationUserModelId(&length, nullptr) == ERROR_INSUFFICIENT_BUFFER) {
-      std::wstring aumid;
-      aumid.resize(length);
-      if(GetCurrentApplicationUserModelId(&length, aumid.data()) == ERROR_SUCCESS) {
-        aumid.resize(length - 1);
-        return aumid;
-      }
-    }
-    return L"";
-  }
 }
 
 static int Exit(lua_State* L) {
@@ -99,36 +85,18 @@ static int SetDpiAwareness(lua_State* L) {
   return 0;  
 }
 
-static int SetAUMID(lua_State* L) {
-
-  std::string aumid = luaL_checkstring(L, 1);
-  
-  HRESULT hr = SetCurrentProcessExplicitAppUserModelID(toWString(aumid).c_str());
-  if (SUCCEEDED(hr)) {
-    lua_pushboolean(L, true);
-  } else {
-    lua_pushboolean(L, false);
-  }
-
-  return 1;  
-}
-
 LUALIB_API int luaopen_process(lua_State* L) {
 
     const struct luaL_Reg exports[] = {
         {"exit", Exit},
         {"cmdLine", CmdLine},
         {"SetDpiAwareness", SetDpiAwareness},
-        {"SetAUMID", SetAUMID},
         { NULL, NULL }
     };
     luaL_newlib(L, exports);
     
     lua_pushinteger(L, GetCurrentProcessId());  
     lua_setfield(L, -2, "pid");
-
-    lua_pushstring(L, toString(Process::GetAUMID()).c_str());
-    lua_setfield(L, -2, "aumid");
 
     lua_pushstring(L, toString(Process::GetCurrentProcessName()).c_str());
     lua_setfield(L, -2, "name");
