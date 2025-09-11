@@ -244,7 +244,9 @@ local dialog = require("dialog")
 Display a messagebox and return the user response input.
 
 Button: `OK` | `OKCANCEL` | `YESNO` | `YESNOCANCEL` | `RETRYCANCEL` | `ABORTRETRYIGNORE`
+
 Icon: `INFO` | `WARNING` | `ERROR` | `QUESTION`
+
 Response: `OK` | `CANCEL` | `ABORT` | `RETRY` | `IGNORE` | `YES` | `NO` | `CONTINUE` | `TRYAGAIN`
 
 ### 📦 Gamepad
@@ -268,7 +270,9 @@ local memory = require("memory")
 
 - `Write(address: number, value: string) bool, Failure | nil`
 
-Write value byte to specified address.
+Write value byte to specified address. whitespace are ignored.
+
+Ex: "90 90 90 90 90 90"
 
 - `Find(pattern: string) address: number, Failure | nil`
 

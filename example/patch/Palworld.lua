@@ -1,0 +1,33 @@
+local memory = require("memory")
+
+-- Ultrawide
+local patches = {
+  {  -- AspectRatioAxisConstraint
+    pattern = "0F ?? ?? ?? ?? ?? 41 ?? ?? ?? ?? ?? 00 00 48 ?? ?? ?? ?? 00 00 4C ?? ?? 4D ?? ??", 
+    offset = 0x06, 
+    value = "BA 00 00 00 00 90 90 90",
+  },
+  {  -- ConstrainAspectRatio
+    pattern = "74 ?? F3 0F ?? ?? ?? ?? ?? ?? F3 0F ?? ?? ?? ?? ?? ?? EB ?? F3 0F ?? ?? ?? ?? ?? ?? F3 0F ?? ?? ?? 0F ?? ??", 
+    offset = 0x49, 
+    value = "90 90 90 90 90",
+  },
+}
+
+function apply(patch)
+  local address, err = memory.Find(patch.pattern)
+  if err then
+    error(err.message)
+  end
+  local success, err = memory.Write(address + patch.offset, patch.value)
+  if err then
+    error(err.message)
+  end
+  return success
+end
+
+for _, patch in ipairs(patches) do
+  if apply(patch) then
+    console.log("Applied patch!)
+  end
+end
