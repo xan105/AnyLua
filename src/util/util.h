@@ -11,4 +11,5 @@ found in the LICENSE file in the root directory of this source tree.
 
 std::wstring Getenv(LPCWSTR name);
 std::wstring GetLastErrorMessage();
+std::wstring GetSelfDir();
 void EnableConsole();

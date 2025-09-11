@@ -52,8 +52,8 @@ end
 Usage
 =====
 
-AnyLua will load `main.lua` relative to the target process dir.<br />
-The path of the Lua script to load can be overriden with the env var `ANYLUA_FILEPATH`.
+AnyLua will load `main.lua` relative to its own parent dir.<br />
+The path can be overriden with the env var `ANYLUA_FILEPATH`.
 
 AnyLua can be used either as 
 - ~~A) a drop-in replacement _(DLL side-loading)_ or~~
@@ -219,7 +219,105 @@ end
 
 ## 📦 Modules
 
-//TODO
+### 📦 Audio
+
+```lua
+local audio = require("audio")
+```
+
+- `PlaySystemSound(name: string) void`
+
+  Play specified Windows sytem sound asynchronously.
+
+- `PlaySound(filepath: string) void`
+
+  Play specified `.wav` filepath asynchronously.
+
+### 📦 Dialog
+
+```lua
+local dialog = require("dialog")
+```
+
+- `Show({ message: string, title?: string, button?: string, icon?: string }) string`
+
+Display a messagebox and return the user response input.
+
+Button: `OK` | `OKCANCEL` | `YESNO` | `YESNOCANCEL` | `RETRYCANCEL` | `ABORTRETRYIGNORE`
+Icon: `INFO` | `WARNING` | `ERROR` | `QUESTION`
+Response: `OK` | `CANCEL` | `ABORT` | `RETRY` | `IGNORE` | `YES` | `NO` | `CONTINUE` | `TRYAGAIN`
+
+### 📦 Gamepad
+
+```lua
+local gamepad = require("gamepad/xinput")
+```
+
+- `Rumble(playerID: number, vibration: number | {low?: number, high?: number }, duration?: number = 2500) void`
+
+Rumble specified XInput gamepad. 
+playderID: 0...3
+vibration: percent 0-100, as number = both motor.
+duration: in ms defaults to 2500 
+
+### 📦 Memory
+
+```lua
+local memory = require("memory")
+```
+
+- `Write(address: number, value: string) bool, Failure | nil`
+
+Write value byte to specified address.
+
+- `Find(pattern: string) address: number, Failure | nil`
+
+Find specified pattern hex string inside the process memory space and return its address.
+
+pattern: use `?` for wildcard, whitespace are ignored.
+
+Ex: "AA ?? BB CC ?? ?? DD"
+
+- `ReadAt(address: number, typeStr: string, length?: number = 256) number | string | nil, Failure | nil`
+
+Read the value at address as specified type.
+
+typeStr: `INT8` | `UINT8` | `INT16` | `UINT16` | `INT32` | `UINT32` | `INT64` | `UINT64` | `FLOAT` | `DOUBLE` | `POINTER` | `CSTRING`
+
+length: length of `CSTRING` defaults to 256
+
+### 📦 Process
+
+```lua
+local process = require("process")
+```
+  
+`pid: number`: process pid
+`name: string`: process name
+`dir: string`: process parent dir
+`cwd: string`: process current working dir
+
+- `Exit(exitCode: number) void`
+
+Terminate process with specified code
+
+- `Args() string[], Failure | nil`
+
+Process command line arguments
+
+- `Env() {key=val, ...}, Failure | nil`
+
+Process environement variables
+
+- `SetDpiAwareness(awareness: string) void`
+
+Set process dpi awareness: `UNAWARE` | `SYSTEM` | `MONITOR` | `MONITORv2` | `GDISCALED`
+
+- `LoadLibrary(filename: string) bool, Failure | nil`
+
+Load specified dynamic library into the process.
+
+cf: [Kernel32/LoadLibraryW()](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw)
   
 Build
 =====

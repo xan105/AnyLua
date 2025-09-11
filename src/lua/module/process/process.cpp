@@ -139,9 +139,9 @@ static int LoadLib(lua_State* L) {
 LUALIB_API int luaopen_process(lua_State* L) {
 
     const struct luaL_Reg exports[] = {
-        {"exit", Exit},
-        {"args", CmdLine},
-        {"env", EnvVar},
+        {"Exit", Exit},
+        {"Args", CmdLine},
+        {"Env", EnvVar},
         {"SetDpiAwareness", SetDpiAwareness},
         {"LoadLibrary", LoadLib},
         { NULL, NULL }

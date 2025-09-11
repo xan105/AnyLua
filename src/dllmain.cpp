@@ -87,7 +87,7 @@ DWORD WINAPI Main(LPVOID lpReserved) {
 
     //Load and run main lua file
     std::wstring lua_file = Getenv(L"ANYLUA_FILEPATH");
-    if (lua_file.empty()) lua_file = Process::GetCurrentProcessDir() + L"main.lua";
+    if (lua_file.empty()) lua_file = GetSelfDir() + L"main.lua";
     if (luaL_dofile(L, toString(lua_file).c_str()) != LUA_OK) {
         panic(L);
     }
