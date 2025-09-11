@@ -11,6 +11,8 @@ extern "C" {
   #include <lauxlib.h>
   #include <lualib.h>
 }
+#include <map>
+#include <string>
 
-static int findAddress(lua_State* L);
-LUALIB_API int luaopen_memory(lua_State* L);
+int DialogShow(lua_State* L);
+LUALIB_API int luaopen_dialog(lua_State* L);

@@ -12,4 +12,5 @@ extern "C" {
   #include <lualib.h>
 }
 
-int lua_sleep(lua_State *L);
+static int sleep(lua_State* L);
+void register_sleep(lua_State* L);

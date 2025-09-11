@@ -5,12 +5,22 @@ found in the LICENSE file in the root directory of this source tree.
 */
 
 #include "dllmain.h"
-#include "util.h"
+#include "util/string.h"
+#include "util/util.h"
 
 //Extend LUA API
-#include "LUA/globals.h"
-#include "LUA/process/process.h"
-#include "LUA/memory/memory.h"
+//Type
+#include "lua/type/failure.h"
+//Global
+#include "lua/global/sleep.h"
+#include "lua/global/console.h"
+#include "lua/global/array.h"
+//Module
+#include "lua/module/process/process.h"
+#include "lua/module/memory/memory.h"
+#include "lua/module/dialog/dialog.h"
+#include "lua/module/audio/audio.h"
+#include "lua/module/gamepad/xinput.h"
 
 lua_State* L = NULL;
 
@@ -44,29 +54,40 @@ void load_std_libs(lua_State* L) {
 }
 
 void panic(lua_State *L) {
-    const char *error = lua_tostring(L, -1);
+    std::string error = lua_tostring(L, -1);
     std::cerr << "Lua error: " << error << std::endl;
-    MessageBoxA(NULL, error, "Lua Error", MB_ICONERROR | MB_OK);
+    MessageBoxA(NULL, error.c_str(), "AnyLua Error", MB_ICONERROR | MB_OK);
     ExitProcess(1);
 }
 
 DWORD WINAPI Main(LPVOID lpReserved) {
     
     #ifdef _DEBUG
-        enableConsole();
+        EnableConsole();
     #endif
     
     L = luaL_newstate();
     load_std_libs(L);
+    
+    //Custom Type
+    register_failure(L);
+    //Override built-in and alias it to console.log
+    lua_pushcfunction(L, console_log);
+    lua_setglobal(L, "print");
     //Extend Globals
-    lua_register(L, "sleep", lua_sleep);
+    register_sleep(L);
+    register_console(L);
+    register_array(L);
     //Custom LUA module
     preloadModule(L, "process", luaopen_process);
     preloadModule(L, "memory", luaopen_memory);
+    preloadModule(L, "dialog", luaopen_dialog);
+    preloadModule(L, "audio", luaopen_audio);
+    preloadModule(L, "gamepad/xinput", luaopen_gamepad_xinput);
 
     //Load and run main lua file
-    std::wstring lua_file = Getenv(L"LUA_FILEPATH");
-    if (lua_file.empty()) lua_file = GetCurrentProcessDir() + L"main.lua";
+    std::wstring lua_file = Getenv(L"ANYLUA_FILEPATH");
+    if (lua_file.empty()) lua_file = GetSelfDir() + L"main.lua";
     if (luaL_dofile(L, toString(lua_file).c_str()) != LUA_OK) {
         panic(L);
     }
