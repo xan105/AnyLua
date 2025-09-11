@@ -68,7 +68,7 @@ Unless you know what you are doing stick with the first approach.
 
 You need a DLL injector to inject `AnyLua` into the target process.
 
-A quick google search will find you plenty on GitHub.
+A quick google search will find you plenty on GitHub.<br/>
 🐧 Linux: the classic combo `createRemoteThread()` + `LoadLibrary()` from `Kernel32` works under Wine/Proton.
 
 Alternatively, here are some of my own:
@@ -93,7 +93,7 @@ Alternatively, here are some of my own:
     "ANYLUA_FILEPATH": "%CURRENTDIR%\\main.lua"
   },
   "addons": [
-    { "path": "Binaries/AnyLua.asi", "required": true },
+    { "path": "Binaries/AnyLua.asi", "required": true }
   ]
 }
 ```
