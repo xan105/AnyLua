@@ -13,71 +13,77 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{e1cce508-2e95-4957-8f4d-1de7b0d99774}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lua">
+      <UniqueIdentifier>{34b8987f-7fa9-449f-9ef2-aae41e446089}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lua\module">
+      <UniqueIdentifier>{b6ae6611-5a99-40ff-aaf5-c3b1a9b78336}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lua\global">
+      <UniqueIdentifier>{b4b6c101-1740-499a-bb7e-5caae9d93950}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lua\type">
+      <UniqueIdentifier>{efb5e5af-78df-4932-85f2-cc1c0826b826}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lua">
+      <UniqueIdentifier>{868a2232-dfd8-4eff-a69f-6b96afb2cc12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{6dbd435b-5296-49aa-b0d6-78f4933ea7a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lua\module">
+      <UniqueIdentifier>{775d6f3d-a985-4b12-9fbe-467548cbfc29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lua\global">
+      <UniqueIdentifier>{5d9b220d-d6b4-4ee0-9508-f730b47c6b0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lua\type">
+      <UniqueIdentifier>{8d5c2757-27ef-4422-82ec-216ec35dd387}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\util\string.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\util\util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\global\console.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\global\sleep.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\module\process\process.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\global\array.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\module\memory\memory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\type\failure.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\lua\module\audio\audio.cpp">
+      <Filter>Source Files\lua\module</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lua\module\dialog\dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\lua\module\audio\audio.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\lua\module</Filter>
     </ClCompile>
     <ClCompile Include="..\src\lua\module\gamepad\xinput.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\lua\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\module\memory\memory.cpp">
+      <Filter>Source Files\lua\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\module\process\process.cpp">
+      <Filter>Source Files\lua\module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\global\array.cpp">
+      <Filter>Source Files\lua\global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\global\console.cpp">
+      <Filter>Source Files\lua\global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\global\sleep.cpp">
+      <Filter>Source Files\lua\global</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lua\type\failure.cpp">
+      <Filter>Source Files\lua\type</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\util\util.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\util\string.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\dllmain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\util\string.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\util\util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lua\global\console.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lua\global\sleep.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lua\module\process\process.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lua\global\array.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lua\module\memory\memory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\lua\type\failure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\resource.h">
@@ -86,14 +92,38 @@
     <ClInclude Include="..\src\version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\lua\module\dialog\dialog.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\src\util\util.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\util\string.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\global\array.h">
+      <Filter>Header Files\lua\global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\global\console.h">
+      <Filter>Header Files\lua\global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\global\sleep.h">
+      <Filter>Header Files\lua\global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\type\failure.h">
+      <Filter>Header Files\lua\type</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lua\module\audio\audio.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\lua\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\module\dialog\dialog.h">
+      <Filter>Header Files\lua\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\module\memory\memory.h">
+      <Filter>Header Files\lua\module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lua\module\process\process.h">
+      <Filter>Header Files\lua\module</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lua\module\gamepad\xinput.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\lua\module</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
