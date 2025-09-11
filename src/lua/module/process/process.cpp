@@ -12,7 +12,7 @@ found in the LICENSE file in the root directory of this source tree.
 namespace Process {
   std::wstring GetCurrentProcessDir() 
   {
-      TCHAR buffer[MAX_PATH] = { 0 };
+      WCHAR buffer[MAX_PATH] = { 0 };
       GetModuleFileNameW(NULL, buffer, MAX_PATH);
 
       std::wstring path(buffer);
@@ -25,7 +25,7 @@ namespace Process {
 
   std::wstring GetCurrentProcessName() 
   {
-      TCHAR buffer[MAX_PATH] = { 0 };
+      WCHAR buffer[MAX_PATH] = { 0 };
       GetModuleFileNameW(NULL, buffer, MAX_PATH);
 
       std::wstring path(buffer);
@@ -33,6 +33,14 @@ namespace Process {
       if (pos != std::wstring::npos) {
           path = path.substr(pos + 1);
       }
+      return path;
+  }
+  
+  std::wstring GetCurrentWorkingDir() 
+  {
+      WCHAR buffer[MAX_PATH] = { 0 };
+      GetCurrentDirectoryW(MAX_PATH, buffer);
+      std::wstring path(buffer);
       return path;
   }
 }
@@ -50,7 +58,7 @@ static int CmdLine(lua_State* L) {
     lua_createtable(L, nArgs, 0);
     
     if (!argv) {
-      lua_pushFailure(L, "ERR_WIN32_API", "Failed to retrieve command line arguments");
+      lua_pushFailure(L, "ERR_WIN32_API", "Fail to retrieve command line arguments");
       return 2;
     }
 
@@ -63,6 +71,34 @@ static int CmdLine(lua_State* L) {
     }
     LocalFree(argv);
     
+    lua_pushnil(L);
+    return 2;
+}
+
+static int EnvVar(lua_State* L) {
+
+    lua_newtable(L);
+    
+    LPWCH env = GetEnvironmentStringsW();
+    if (!env) {
+        lua_pushFailure(L, "ERR_WIN32_API", "Fail to retrieve environment variables");
+        return 2;
+    }
+    LPWCH pEnv = env;
+
+    while (*env) {
+        std::wstring str(env);
+        size_t pos = str.find(L'=');
+        if (pos != std::wstring::npos && pos > 0) {
+            std::wstring key = str.substr(0, pos);
+            std::wstring val = str.substr(pos + 1);
+            lua_pushstring(L, toString(val).c_str());
+            lua_setfield(L, -2, toString(key).c_str());
+        }
+        env += wcslen(env) + 1;
+    }
+    FreeEnvironmentStringsW(pEnv);
+
     lua_pushnil(L);
     return 2;
 }
@@ -85,12 +121,29 @@ static int SetDpiAwareness(lua_State* L) {
   return 0;  
 }
 
+static int LoadLib(lua_State* L) {
+
+    std::string lpLibFileName = luaL_checkstring(L, 1);
+    
+    if (LoadLibraryW(toWString(lpLibFileName).c_str()) == nullptr) {
+        lua_pushboolean(L, false);
+        lua_pushFailure(L, "ERR_WIN32_API", toString(GetLastErrorMessage()).c_str());
+    }
+
+    lua_pushboolean(L, true);
+    lua_pushnil(L);
+
+    return 2;
+}
+
 LUALIB_API int luaopen_process(lua_State* L) {
 
     const struct luaL_Reg exports[] = {
         {"exit", Exit},
-        {"cmdLine", CmdLine},
+        {"args", CmdLine},
+        {"env", EnvVar},
         {"SetDpiAwareness", SetDpiAwareness},
+        {"LoadLibrary", LoadLib},
         { NULL, NULL }
     };
     luaL_newlib(L, exports);
@@ -103,6 +156,9 @@ LUALIB_API int luaopen_process(lua_State* L) {
     
     lua_pushstring(L, toString(Process::GetCurrentProcessDir()).c_str());
     lua_setfield(L, -2, "dir");
+    
+    lua_pushstring(L, toString(Process::GetCurrentWorkingDir()).c_str());
+    lua_setfield(L, -2, "cwd");
 
     return 1;
 }

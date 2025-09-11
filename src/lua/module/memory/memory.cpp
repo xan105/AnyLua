@@ -154,7 +154,7 @@ int MemoryFind(lua_State* L) {
     HANDLE processHandle = GetCurrentProcess();
     if (!GetModuleInformation(processHandle, GetModuleHandle(NULL), &moduleInfo, sizeof(moduleInfo))) {
         lua_pushinteger(L, 0);
-        lua_pushFailure(L, "ERR_WIN32_API", "Failed to get current process handle");
+        lua_pushFailure(L, "ERR_WIN32_API", "Fail to get current process handle");
         return 2;
     }
 

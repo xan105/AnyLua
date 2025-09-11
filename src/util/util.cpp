@@ -19,6 +19,23 @@ std::wstring Getenv(LPCWSTR name) {
     }
 }
 
+std::wstring GetLastErrorMessage() {
+    DWORD code = ::GetLastError();
+    LPWSTR buffer = nullptr;
+    size_t size = FormatMessageW(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        code,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPWSTR)&buffer,
+        0,
+        NULL
+    );
+    std::wstring message(buffer, size);
+    LocalFree(buffer);
+    return L"Error " + std::to_wstring(code) + L": " + message;
+}
+
 void EnableConsole() {
     if (AllocConsole()) {
         HWND consoleWindow = GetConsoleWindow();
