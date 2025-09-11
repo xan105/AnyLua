@@ -86,7 +86,7 @@ DWORD WINAPI Main(LPVOID lpReserved) {
     preloadModule(L, "gamepad/xinput", luaopen_gamepad_xinput);
 
     //Load and run main lua file
-    std::wstring lua_file = Getenv(L"LUA_FILEPATH");
+    std::wstring lua_file = Getenv(L"ANYLUA_FILEPATH");
     if (lua_file.empty()) lua_file = Process::GetCurrentProcessDir() + L"main.lua";
     if (luaL_dofile(L, toString(lua_file).c_str()) != LUA_OK) {
         panic(L);

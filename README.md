@@ -51,10 +51,14 @@ end
 Usage
 =====
 
-Upon injection the process will load `main.lua` relative to the process dir (**not** the current working dir).<br />
-The path of the Lua script to load can be override with the env var `LUA_FILEPATH`.
+AnyLua will load `main.lua` relative to the target process dir.<br />
+The path of the Lua script to load can be overriden with the env var `ANYLUA_FILEPATH`.
 
-//TODO
+AnyLua can be used either as 
+- ~~A) a drop-in replacement _(DLL side-loading)_ or~~
+- **B)** by being injected into a target process.
+
+Unless you know what you are doing stick with the first approach.
 
 ## A) DLL Sideloading
 
@@ -62,7 +66,67 @@ The path of the Lua script to load can be override with the env var `LUA_FILEPAT
 
 ## B) DLL Injection
 
-//TODO
+You need a DLL injector to inject `AnyLua` into the target process.
+
+A quick google search will find you plenty on GitHub.
+🐧 Linux: the classic combo `createRemoteThread()` + `LoadLibrary()` from `Kernel32` works under Wine/Proton.
+
+Alternatively, here are some of my own:
+
+- [xan105/Mini-Launcher](https://github.com/xan105/Mini-Launcher):
+
+  > CLI launcher with DLL Injection, Lua Scripting, Splash screen, and other goodies.
+
+- [xan105/node-remote-thread](https://github.com/xan105/node-remote-thread):
+
+  > Node.js NAPI Native addon for Windows DLL injection with support for Wow64 and Unicode path.
+
+> [!TIP]
+> Consider changing the file extension from `.dll` to `.asi` to help prevent false positive with Windows Defender.
+
+<details><summary>Example (xan105/Mini-Launcher)</summary>
+
+```json
+{
+  "bin": "Binaries/NMS.exe",
+  "env": {
+    "ANYLUA_FILEPATH": "%CURRENTDIR%\\main.lua"
+  },
+  "addons": [
+    { "path": "Binaries/AnyLua.asi", "required": true },
+  ]
+}
+```
+</details>
+
+<details><summary>Example (xan105/node-remote-thread)</summary>
+
+```js
+import { env } from "node:process";
+import { spawn } from "node:child_process";
+import { dirname, join } from "node:path";
+import { createRemoteThread } from "@xan105/remote-thread";
+
+const EXECUTABLE = "G:\\METAPHOR\\METAPHOR.exe";
+const ADDON = "G:\\METAPHOR\\AnyLua.dll";
+const ARGS = [];
+
+const binary = spawn(EXECUTABLE, ARGS, {
+  cwd: dirname(EXECUTABLE),
+  stdio:[ "ignore", "ignore", "ignore" ], 
+  detached: true,
+  env: {
+    ...env,
+    "ANYLUA_FILEPATH": join(dirname(EXECUTABLE), "main.lua")
+  }
+});
+
+binary.once("spawn", () => {
+  binary.unref();
+  createRemoteThread(binary.pid, ADDON);
+});
+```
+</details>
 
 LUA Scripting
 =============
