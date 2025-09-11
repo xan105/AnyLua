@@ -7,6 +7,7 @@ About
 </p>
 
 This project adds a "Lua Script engine" to any process through DLL injection or sideloading.
+
 The goal is to be able to handle things like memory manipulation and Win32 APIs from Lua.
 It is powered by [LuaJIT](https://luajit.org/) (Lua 5.1).
 
@@ -218,7 +219,7 @@ end
 
 ## 📦 Modules
 
-
+//TODO
   
 Build
 =====
