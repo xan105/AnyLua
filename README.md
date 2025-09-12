@@ -307,10 +307,10 @@ local memory = require("memory")
 local process = require("process")
 ```
   
-`pid: number`: process pid
-`name: string`: process name
-`dir: string`: process parent dir
-`cwd: string`: process current working dir
+`pid: number`: process pid<br/>
+`name: string`: process name<br/>
+`dir: string`: process parent dir<br/>
+`cwd: string`: process current working dir<br/>
 
 - `Exit(exitCode: number) void`
 
