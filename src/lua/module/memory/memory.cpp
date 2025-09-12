@@ -6,6 +6,7 @@ found in the LICENSE file in the root directory of this source tree.
 
 #include "memory.h"
 #include "../../type/failure.h"
+#include "../../../util/string.h"
 
 namespace Memory {
 
@@ -137,7 +138,6 @@ int MemoryWrite(lua_State* L) {
     return 2;
 }
 
-
 int MemoryFind(lua_State* L) {
     std::string patternStr = luaL_checkstring(L, 1);
     std::vector<int> pattern = {};
@@ -150,11 +150,22 @@ int MemoryFind(lua_State* L) {
         return 2;
     }
     
+    HMODULE hModule = GetModuleHandle(NULL);
+    if (lua_gettop(L) >= 2 && lua_isstring(L, 2)) {
+        std::string moduleName = lua_tostring(L, 2);
+        hModule = GetModuleHandleW(toWString(moduleName).c_str());
+        if (!hModule) {
+            lua_pushinteger(L, 0);
+            lua_pushFailure(L, "ERR_WIN32_API", "Fail to get module handle");
+            return 2;
+        }
+    }
+
     MODULEINFO moduleInfo;
-    HANDLE processHandle = GetCurrentProcess();
-    if (!GetModuleInformation(processHandle, GetModuleHandle(NULL), &moduleInfo, sizeof(moduleInfo))) {
+    HANDLE hProcess = GetCurrentProcess();
+    if (!GetModuleInformation(hProcess, hModule, &moduleInfo, sizeof(moduleInfo))) {
         lua_pushinteger(L, 0);
-        lua_pushFailure(L, "ERR_WIN32_API", "Fail to get current process handle");
+        lua_pushFailure(L, "ERR_WIN32_API", "Fail to get module information");
         return 2;
     }
 
