@@ -241,13 +241,13 @@ local dialog = require("dialog")
 
 - `Show({ message: string, title?: string, button?: string, icon?: string }) string`
 
-Display a messagebox and return the user response input.
+  Display a messagebox and return the user response input.
 
-Button: `OK` | `OKCANCEL` | `YESNO` | `YESNOCANCEL` | `RETRYCANCEL` | `ABORTRETRYIGNORE`
+  Button: `OK` | `OKCANCEL` | `YESNO` | `YESNOCANCEL` | `RETRYCANCEL` | `ABORTRETRYIGNORE`
 
-Icon: `INFO` | `WARNING` | `ERROR` | `QUESTION`
+  Icon: `INFO` | `WARNING` | `ERROR` | `QUESTION`
 
-Response: `OK` | `CANCEL` | `ABORT` | `RETRY` | `IGNORE` | `YES` | `NO` | `CONTINUE` | `TRYAGAIN`
+  Response: `OK` | `CANCEL` | `ABORT` | `RETRY` | `IGNORE` | `YES` | `NO` | `CONTINUE` | `TRYAGAIN`
 
 ### 📦 Gamepad
 
@@ -257,10 +257,10 @@ local gamepad = require("gamepad/xinput")
 
 - `Rumble(playerID: number, vibration: number | {low?: number, high?: number }, duration?: number = 2500) void`
 
-Rumble specified XInput gamepad. 
-playderID: 0...3
-vibration: percent 0-100, as number = both motor.
-duration: in ms defaults to 2500 
+  Rumble specified XInput gamepad. 
+  playderID: 0...3
+  vibration: percent 0-100, as number = both motor.
+  duration: in ms defaults to 2500 
 
 ### 📦 Memory
 
@@ -270,34 +270,34 @@ local memory = require("memory")
 
 - `Write(address: number, value: string) bool, Failure | nil`
 
-Write value byte to specified address. whitespace are ignored.
+  Write value byte to specified address. whitespace are ignored.
 
-Ex: "90 90 90 90 90 90"
+  Ex: "90 90 90 90 90 90"
 
 - `Find(pattern: string, module?: string) address: number, Failure | nil`
 
-Find specified pattern hex string inside the process memory space and return its address.
+  Find specified pattern hex string inside the process memory space and return its address.
 
-pattern: use `?` for wildcard, whitespace are ignored.
+  pattern: use `?` for wildcard, whitespace are ignored.
 
-Ex: "AA ?? BB CC ?? ?? DD"
+  Ex: "AA ?? BB CC ?? ?? DD"
 
-module: when specified, scan module memory region instead of process
+  module: when specified, scan module memory region instead of process
 
-Ex: `MemoryFind("48 8B ?? ?? ??", "UnityPlayer.dll")`
+  Ex: `MemoryFind("48 8B ?? ?? ??", "UnityPlayer.dll")`
 
-> [!WARNING]
-> ⚠️ Note on 64-bit addresses
-> LuaJIT (Lua 5.1) store numbers as double-precision floats, which only guarantee 53 bits of integer precision. On 64-bit processes, very high addresses (above 0x20000000000000) may lose precision when returned as Lua numbers. 
-> For most Windows modules and processes this usually isn’t an issue, but could be, if you need exact 64-bit pointers.
+  > [!WARNING]
+  > ⚠️ Note on 64-bit addresses
+  > LuaJIT (Lua 5.1) store numbers as double-precision floats, which only guarantee 53 bits of integer precision. On 64-bit processes,  very high addresses (above 0x20000000000000) may lose precision when returned as Lua numbers. 
+  > For most Windows modules and processes this usually isn’t an issue, but could be, if you need exact 64-bit pointers.
 
 - `ReadAt(address: number, typeStr: string, length?: number = 256) number | string | nil, Failure | nil`
 
-Read the value at address as specified type.
+  Read the value at address as specified type.
 
-typeStr: `INT8` | `UINT8` | `INT16` | `UINT16` | `INT32` | `UINT32` | `INT64` | `UINT64` | `FLOAT` | `DOUBLE` | `POINTER` | `CSTRING`
+  typeStr: `INT8` | `UINT8` | `INT16` | `UINT16` | `INT32` | `UINT32` | `INT64` | `UINT64` | `FLOAT` | `DOUBLE` | `POINTER` | `CSTRING`
 
-length: length of `CSTRING` defaults to 256
+  length: length of `CSTRING` defaults to 256
 
 ### 📦 Process
 
@@ -312,25 +312,25 @@ local process = require("process")
 
 - `Exit(exitCode: number) void`
 
-Terminate process with specified code
+  Terminate process with specified code
 
 - `Args() string[], Failure | nil`
 
-Process command line arguments
+  Process command line arguments
 
 - `Env() {key=val, ...}, Failure | nil`
 
-Process environement variables
+  Process environement variables
 
 - `SetDpiAwareness(awareness: string) void`
 
-Set process dpi awareness: `UNAWARE` | `SYSTEM` | `MONITOR` | `MONITORv2` | `GDISCALED`
+  Set process dpi awareness: `UNAWARE` | `SYSTEM` | `MONITOR` | `MONITORv2` | `GDISCALED`
 
 - `LoadLibrary(filename: string) bool, Failure | nil`
 
-Load specified dynamic library into the process.
+  Load specified dynamic library into the process.
 
-cf: [Kernel32/LoadLibraryW()](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw)
+  cf: [Kernel32/LoadLibraryW()](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryw)
   
 Build
 =====
