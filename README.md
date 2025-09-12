@@ -286,10 +286,10 @@ local memory = require("memory")
 
   Ex: `MemoryFind("48 8B ?? ?? ??", "UnityPlayer.dll")`
 
-  > [!WARNING]
-  > ⚠️ Note on 64-bit addresses
-  > LuaJIT (Lua 5.1) store numbers as double-precision floats, which only guarantee 53 bits of integer precision. On 64-bit processes,  very high addresses (above 0x20000000000000) may lose precision when returned as Lua numbers. 
-  > For most Windows modules and processes this usually isn’t an issue, but could be, if you need exact 64-bit pointers.
+> [!WARNING]
+> ⚠️ Note on 64-bit addresses
+> LuaJIT (Lua 5.1) store numbers as double-precision floats, which only guarantee 53 bits of integer precision. On 64-bit processes,  very high addresses (above 0x20000000000000) may lose precision when returned as Lua numbers. 
+> For most Windows modules and processes this usually isn’t an issue, but could be, if you need exact 64-bit pointers.
 
 - `ReadAt(address: number, typeStr: string, length?: number = 256) number | string | nil, Failure | nil`
 
