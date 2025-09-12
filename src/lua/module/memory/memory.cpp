@@ -194,51 +194,51 @@ int MemoryReadAt(lua_State* L) {
     size_t length = static_cast<size_t>(luaL_optinteger(L, 3, 256));
 
     try {
-        if (typeStr == "INT8"){
+        if (typeStr == "INT8" || typeStr == "i8"){
           lua_pushinteger(L, SafeRead<int8_t>(address));  
           lua_pushnil(L);
         }
-        else if (typeStr == "UINT8"){
+        else if (typeStr == "UINT8" || typeStr == "u8"){
           lua_pushinteger(L, SafeRead<uint8_t>(address));
           lua_pushnil(L);
         }
-        else if (typeStr == "INT16"){
+        else if (typeStr == "INT16" || typeStr == "i16"){
           lua_pushinteger(L, SafeRead<int16_t>(address));
           lua_pushnil(L);
         }
-        else if (typeStr == "UINT16"){
+        else if (typeStr == "UINT16" || typeStr == "u16"){
           lua_pushinteger(L, SafeRead<uint16_t>(address));
           lua_pushnil(L);
         }
-        else if (typeStr == "INT32"){
+        else if (typeStr == "INT32" || typeStr == "i32"){
           lua_pushinteger(L, SafeRead<int32_t>(address));
           lua_pushnil(L);
         }
-        else if (typeStr == "UINT32"){
+        else if (typeStr == "UINT32" || typeStr == "u32"){
           lua_pushinteger(L, SafeRead<uint32_t>(address));
           lua_pushnil(L);
         }
-        else if (typeStr == "INT64"){
+        else if (typeStr == "INT64" || typeStr == "i64"){
           lua_pushinteger(L, SafeRead<int64_t>(address));
           lua_pushnil(L);
         }
-        else if (typeStr == "UINT64"){
+        else if (typeStr == "UINT64" || typeStr == "u64"){
           lua_pushinteger(L, SafeRead<uint64_t>(address));
           lua_pushnil(L);
         }
-        else if (typeStr == "FLOAT"){
+        else if (typeStr == "FLOAT" || typeStr == "f32"){
           lua_pushnumber(L, SafeRead<float>(address));
           lua_pushnil(L);
         }
-        else if (typeStr == "DOUBLE"){
+        else if (typeStr == "DOUBLE" || typeStr == "f64"){
           lua_pushnumber(L, SafeRead<double>(address));
           lua_pushnil(L);
         }
-        else if (typeStr == "POINTER"){
+        else if (typeStr == "POINTER" || typeStr == "ptr"){
           lua_pushinteger(L, SafeRead<uintptr_t>(address));
           lua_pushnil(L);
         }
-        else if (typeStr == "CSTRING"){
+        else if (typeStr == "CSTRING" || typeStr == "str"){
           std::vector<char> buffer(length);
           std::memcpy(buffer.data(), reinterpret_cast<const void*>(address), length);
           std::string str(buffer.data(), strnlen(buffer.data(), length));

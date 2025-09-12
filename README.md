@@ -257,9 +257,12 @@ local gamepad = require("gamepad/xinput")
 
 - `Rumble(playerID: number, vibration: number | {low?: number, high?: number }, duration?: number = 2500) void`
 
-  Rumble specified XInput gamepad. 
+  Rumble specified XInput gamepad.
+  
   playderID: 0...3
+  
   vibration: percent 0-100, as number = both motor.
+  
   duration: in ms defaults to 2500 
 
 ### 📦 Memory
@@ -297,9 +300,9 @@ local memory = require("memory")
 
   Read the value at address as specified type.
 
-  typeStr: `INT8` | `UINT8` | `INT16` | `UINT16` | `INT32` | `UINT32` | `INT64` | `UINT64` | `FLOAT` | `DOUBLE` | `POINTER` | `CSTRING`
+  typeStr: `INT8` | `UINT8` | `INT16` | `UINT16` | `INT32` | `UINT32` | `INT64` | `UINT64` | `FLOAT` | `DOUBLE` | `POINTER` | `CSTRING` | `i8` | `u8` | `i16` | `u16` | `i32` | `u32` | `i64` | `u64` | `f32` | `f64` | `ptr` | `str`
 
-  length: length of `CSTRING` defaults to 256
+  length: length of `CSTRING` / `str` defaults to 256
 
 ### 📦 Process
 
