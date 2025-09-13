@@ -7,6 +7,7 @@ found in the LICENSE file in the root directory of this source tree.
 #include "memory.h"
 #include "../../type/failure.h"
 #include "../../../util/string.h"
+#include "../../../util/util.h"
 
 namespace Memory {
 
@@ -52,7 +53,10 @@ namespace Memory {
 
     MEMORY_BASIC_INFORMATION mbi;
     while (current < maxAddress) {
-      if (VirtualQuery(reinterpret_cast<LPCVOID>(current), &mbi, sizeof(mbi)) == 0) break;
+      if (VirtualQuery(reinterpret_cast<LPCVOID>(current), &mbi, sizeof(mbi)) == 0) {
+          std::wstring error = GetLastErrorMessage();
+          throw std::runtime_error(toString(error));
+      }
       uintptr_t nextPage = reinterpret_cast<uintptr_t>(mbi.BaseAddress) + mbi.RegionSize;
       if (mbi.State == MEM_COMMIT && !(mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD))){ // Skip irrelevant code regions
       
@@ -111,6 +115,30 @@ namespace Memory {
       }
       return result;
   }
+  
+  MODULEINFO GetModuleInfo(const std::wstring& moduleName = L"")
+  {
+    HMODULE hModule = nullptr;
+    
+    if (moduleName.empty()) {
+      hModule = GetModuleHandleW(nullptr);
+    } else {
+      hModule = GetModuleHandleW(moduleName.c_str());
+    }
+    if (!hModule) {
+        std::wstring error = GetLastErrorMessage();
+        throw std::invalid_argument(toString(error));
+    }
+
+    MODULEINFO moduleInfo = {};
+    HANDLE hProcess = GetCurrentProcess();
+    if (!GetModuleInformation(hProcess, hModule, &moduleInfo, sizeof(moduleInfo))) {
+      std::wstring error = GetLastErrorMessage();
+      throw std::runtime_error(toString(error));
+    }
+    
+    return moduleInfo;
+  }
 }
 
 int MemoryWrite(lua_State* L) {
@@ -149,34 +177,36 @@ int MemoryFind(lua_State* L) {
         lua_pushFailure(L, "ERR_INVALID_ARGUMENT", error.what());
         return 2;
     }
-    
-    HMODULE hModule = GetModuleHandle(NULL);
-    if (lua_gettop(L) >= 2 && lua_isstring(L, 2)) {
-        std::string moduleName = lua_tostring(L, 2);
-        hModule = GetModuleHandleW(toWString(moduleName).c_str());
-        if (!hModule) {
-            lua_pushinteger(L, 0);
-            lua_pushFailure(L, "ERR_WIN32_API", "Fail to get module handle");
-            return 2;
-        }
-    }
 
     MODULEINFO moduleInfo;
-    HANDLE hProcess = GetCurrentProcess();
-    if (!GetModuleInformation(hProcess, hModule, &moduleInfo, sizeof(moduleInfo))) {
+    try {
+      if (lua_gettop(L) >= 2 && lua_isstring(L, 2)) {
+        std::string moduleName = lua_tostring(L, 2);
+        moduleInfo = Memory::GetModuleInfo(toWString(moduleName));
+      } else {
+        moduleInfo = Memory::GetModuleInfo();
+      }
+    } catch (const std::exception& error) {
+      lua_pushinteger(L, 0);
+      lua_pushFailure(L, "ERR_WIN32_API", error.what());
+      return 2;
+    } 
+    
+    uintptr_t baseAddress = reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll);
+    uintptr_t address = 0;
+    try {
+        address = Memory::FindPattern(baseAddress, moduleInfo.SizeOfImage, pattern);
+    } catch(const std::exception& error) {
         lua_pushinteger(L, 0);
-        lua_pushFailure(L, "ERR_WIN32_API", "Fail to get module information");
+        lua_pushFailure(L, "ERR_WIN32_API", error.what());
         return 2;
     }
 
-    uintptr_t baseAddress = reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll);
-    uintptr_t address = Memory::FindPattern(baseAddress, moduleInfo.SizeOfImage, pattern);
     if (!address) {
         lua_pushinteger(L, 0);
         lua_pushFailure(L, "ERR_WIN32_API", "No Pattern found");
         return 2;
     }
-
     lua_pushinteger(L, address);
     lua_pushnil(L);
     return 2; 
@@ -188,73 +218,99 @@ template <typename T> static T SafeRead(uintptr_t address) {
     return value;
 }
 
-int MemoryReadAt(lua_State* L) {
+int MemoryReadAs(lua_State* L) {
     uintptr_t address = static_cast<uintptr_t>(luaL_checkinteger(L, 1));
     std::string typeStr = luaL_checkstring(L, 2);
     size_t length = static_cast<size_t>(luaL_optinteger(L, 3, 256));
 
-    try {
-        if (typeStr == "INT8" || typeStr == "i8"){
-          lua_pushinteger(L, SafeRead<int8_t>(address));  
-          lua_pushnil(L);
-        }
-        else if (typeStr == "UINT8" || typeStr == "u8"){
-          lua_pushinteger(L, SafeRead<uint8_t>(address));
-          lua_pushnil(L);
-        }
-        else if (typeStr == "INT16" || typeStr == "i16"){
-          lua_pushinteger(L, SafeRead<int16_t>(address));
-          lua_pushnil(L);
-        }
-        else if (typeStr == "UINT16" || typeStr == "u16"){
-          lua_pushinteger(L, SafeRead<uint16_t>(address));
-          lua_pushnil(L);
-        }
-        else if (typeStr == "INT32" || typeStr == "i32"){
-          lua_pushinteger(L, SafeRead<int32_t>(address));
-          lua_pushnil(L);
-        }
-        else if (typeStr == "UINT32" || typeStr == "u32"){
-          lua_pushinteger(L, SafeRead<uint32_t>(address));
-          lua_pushnil(L);
-        }
-        else if (typeStr == "INT64" || typeStr == "i64"){
-          lua_pushinteger(L, SafeRead<int64_t>(address));
-          lua_pushnil(L);
-        }
-        else if (typeStr == "UINT64" || typeStr == "u64"){
-          lua_pushinteger(L, SafeRead<uint64_t>(address));
-          lua_pushnil(L);
-        }
-        else if (typeStr == "FLOAT" || typeStr == "f32"){
-          lua_pushnumber(L, SafeRead<float>(address));
-          lua_pushnil(L);
-        }
-        else if (typeStr == "DOUBLE" || typeStr == "f64"){
-          lua_pushnumber(L, SafeRead<double>(address));
-          lua_pushnil(L);
-        }
-        else if (typeStr == "POINTER" || typeStr == "ptr"){
-          lua_pushinteger(L, SafeRead<uintptr_t>(address));
-          lua_pushnil(L);
-        }
-        else if (typeStr == "CSTRING" || typeStr == "str"){
-          std::vector<char> buffer(length);
-          std::memcpy(buffer.data(), reinterpret_cast<const void*>(address), length);
-          std::string str(buffer.data(), strnlen(buffer.data(), length));
-          lua_pushstring(L, str.c_str());
-          lua_pushnil(L);
-        } else {
-          std::string message = "Unsupported type string: " + typeStr;
-          lua_pushnil(L);
-          lua_pushFailure(L, "ERR_INVALID_ARGUMENT", message.c_str());
-        }
-     } catch (...) {
-        std::string message = "Could not read value as type " + typeStr + " at address " + std::to_string(address);
+    MEMORY_BASIC_INFORMATION mbi;
+    if (VirtualQuery(reinterpret_cast<LPCVOID>(address), &mbi, sizeof(mbi)) == 0) {
+        std::wstring error = GetLastErrorMessage();
         lua_pushnil(L);
-        lua_pushFailure(L, "ERR_INVALID_ARGUMENT", message.c_str());
-     }
+        lua_pushFailure(L, "ERR_WIN32_API", toString(error).c_str());
+    }
+    if (mbi.State == MEM_COMMIT && !(mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD))) {
+        if (typeStr == "i8") {
+            lua_pushinteger(L, SafeRead<int8_t>(address));
+            lua_pushnil(L);
+        }
+        else if (typeStr == "u8") {
+            lua_pushinteger(L, SafeRead<uint8_t>(address));
+            lua_pushnil(L);
+        }
+        else if (typeStr == "i16") {
+            lua_pushinteger(L, SafeRead<int16_t>(address));
+            lua_pushnil(L);
+        }
+        else if (typeStr == "u16") {
+            lua_pushinteger(L, SafeRead<uint16_t>(address));
+            lua_pushnil(L);
+        }
+        else if (typeStr == "i32") {
+            lua_pushinteger(L, SafeRead<int32_t>(address));
+            lua_pushnil(L);
+        }
+        else if (typeStr == "u32") {
+            lua_pushinteger(L, SafeRead<uint32_t>(address));
+            lua_pushnil(L);
+        }
+#ifdef _WIN64
+        else if (typeStr == "i64") {
+            lua_pushinteger(L, SafeRead<int64_t>(address));
+            lua_pushnil(L);
+        }
+        else if (typeStr == "u64") {
+            lua_pushinteger(L, SafeRead<uint64_t>(address));
+            lua_pushnil(L);
+        }
+#endif
+        else if (typeStr == "f32") {
+            lua_pushnumber(L, SafeRead<float>(address));
+            lua_pushnil(L);
+        }
+        else if (typeStr == "f64") {
+            lua_pushnumber(L, SafeRead<double>(address));
+            lua_pushnil(L);
+        }
+        else if (typeStr == "ptr") {
+            lua_pushinteger(L, SafeRead<uintptr_t>(address));
+            lua_pushnil(L);
+        }
+        else if (typeStr == "str") {
+            std::vector<char> buffer(length);
+            std::memcpy(buffer.data(), reinterpret_cast<const void*>(address), length);
+            std::string str(buffer.data(), strnlen(buffer.data(), length));
+            lua_pushstring(L, str.c_str());
+            lua_pushnil(L);
+        }
+        else {
+            std::string message = "Unsupported type string: " + typeStr;
+            lua_pushnil(L);
+            lua_pushFailure(L, "ERR_INVALID_ARGUMENT", message.c_str());
+        }
+    }
 
+    lua_pushnil(L);
+    lua_pushFailure(L, "ERR_WIN32_API", "Access violation");
+
+    return 2;
+}
+
+int GetBaseAddress(lua_State* L) {
+    std::string moduleName = luaL_optstring(L, 1, "");
+    
+    MODULEINFO moduleInfo;
+    try {
+        moduleInfo = Memory::GetModuleInfo(toWString(moduleName));
+    } catch (const std::exception& error) {
+      lua_pushinteger(L, 0);
+      lua_pushFailure(L, "ERR_WIN32_API", error.what());
+      return 2;
+    } 
+
+    uintptr_t baseAddress = reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll);
+    lua_pushinteger(L, baseAddress);
+    lua_pushnil(L);
     return 2;
 }
 
@@ -263,7 +319,8 @@ LUALIB_API int luaopen_memory(lua_State* L) {
     const struct luaL_Reg exports[] = {
         {"Write", MemoryWrite},
         {"Find", MemoryFind},
-        {"ReadAt", MemoryReadAt},
+        {"ReadAs", MemoryReadAs},
+        {"GetBaseAddress", GetBaseAddress},
         { NULL, NULL }
     };
 

@@ -23,10 +23,12 @@ namespace Memory {
   bool Patch(uintptr_t address, const std::vector<BYTE>& patch, HANDLE hProcess);
   uintptr_t FindPattern(uintptr_t baseAddress, size_t sizeOfImage, const std::vector<int>& pattern);
   template <typename T> std::vector<T> ParseHexStringTo(const std::string& input);
+  MODULEINFO GetModuleInfo(const std::wstring& moduleName);
 }
 
 int MemoryWrite(lua_State* L);
 int MemoryFind(lua_State* L);
 template <typename T> static T SafeRead(uintptr_t address);
-int MemoryReadAt(lua_State* L);
+int MemoryReadAs(lua_State* L);
+int GetBaseAddress(lua_State* L);
 LUALIB_API int luaopen_memory(lua_State* L);

@@ -271,6 +271,13 @@ local gamepad = require("gamepad/xinput")
 local memory = require("memory")
 ```
 
+> [!WARNING]
+> Note on 64-bit addresses:
+>
+> LuaJIT (Lua 5.1) store numbers as double-precision floats, which only guarantee 53 bits of integer precision. On 64-bit processes,  very high addresses (above 0x20000000000000) may lose precision when returned as Lua numbers. 
+>
+> For most Windows modules and processes this usually isn’t an issue, but could be, if you need exact 64-bit pointers.
+
 - `Write(address: number, value: string) bool, Failure | nil`
 
   Write value byte to specified address. whitespace are ignored.
@@ -283,26 +290,25 @@ local memory = require("memory")
 
   pattern: use `?` for wildcard, whitespace are ignored.
 
-  Ex: "AA ?? BB CC ?? ?? DD"
+  Ex: `MemoryFind("AA ?? BB CC ?? ?? DD")`
 
   module: when specified, scan module memory region instead of process
 
   Ex: `MemoryFind("48 8B ?? ?? ??", "UnityPlayer.dll")`
 
-> [!WARNING]
-> Note on 64-bit addresses:
->
-> LuaJIT (Lua 5.1) store numbers as double-precision floats, which only guarantee 53 bits of integer precision. On 64-bit processes,  very high addresses (above 0x20000000000000) may lose precision when returned as Lua numbers. 
->
-> For most Windows modules and processes this usually isn’t an issue, but could be, if you need exact 64-bit pointers.
-
-- `ReadAt(address: number, typeStr: string, length?: number = 256) number | string | nil, Failure | nil`
+- `ReadAs(address: number, typeStr: string, length?: number = 256) number | string | nil, Failure | nil`
 
   Read the value at address as specified type.
 
-  typeStr: `INT8` | `UINT8` | `INT16` | `UINT16` | `INT32` | `UINT32` | `INT64` | `UINT64` | `FLOAT` | `DOUBLE` | `POINTER` | `CSTRING` | `i8` | `u8` | `i16` | `u16` | `i32` | `u32` | `i64` | `u64` | `f32` | `f64` | `ptr` | `str`
+  typeStr: `i8` | `u8` | `i16` | `u16` | `i32` | `u32` | `i64` | `u64` | `f32` | `f64` | `ptr` | `str`
 
-  length: length of `CSTRING` / `str` defaults to 256
+  length: length of `str` (cstring) defaults to 256
+  
+- `GetBaseAddress(module?: string) address: number, Failure | nil`
+
+  Return the base address of the process.
+
+  module: when specified, return the base address of the module instead.
 
 ### 📦 Process
 
