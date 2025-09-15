@@ -1,2 +1,6 @@
 @echo off
-git clone https://luajit.org/git/luajit.git
+if exist "luajit\" (
+  cd luajit && git pull    
+) else (
+  git clone https://luajit.org/git/luajit.git
+)
