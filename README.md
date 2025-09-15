@@ -290,11 +290,11 @@ local memory = require("memory")
 
   pattern: use `?` for wildcard, whitespace are ignored.
 
-  Ex: `MemoryFind("AA ?? BB CC ?? ?? DD")`
+  Ex: `Find("AA ?? BB CC ?? ?? DD")`
 
   module: when specified, scan module memory region instead of process
 
-  Ex: `MemoryFind("48 8B ?? ?? ??", "UnityPlayer.dll")`
+  Ex: `Find("48 8B ?? ?? ??", "UnityPlayer.dll")`
 
 - `ReadAs(address: number, typeStr: string, length?: number = 256) number | string | nil, Failure | nil`
 
