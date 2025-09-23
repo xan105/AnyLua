@@ -44,10 +44,16 @@ namespace Memory {
         return success;
   }
 
-  uintptr_t FindPattern(uintptr_t baseAddress, size_t sizeOfImage, const std::vector<int>& pattern) 
+  template <typename T> T FindPattern(uintptr_t baseAddress, size_t sizeOfImage, const std::vector<int>& pattern) 
   {
-    if (pattern.empty() || sizeOfImage < pattern.size()) return 0;
-
+    static_assert(
+      std::is_same_v<T, uintptr_t> || std::is_same_v<T, std::vector<uintptr_t>>,
+      "FindPattern<T>: T must be either uintptr_t or std::vector<uintptr_t>"
+    );
+    
+    if (pattern.empty() || sizeOfImage < pattern.size()) return T{};
+    T result{};
+    
     uintptr_t current    = baseAddress;
     uintptr_t maxAddress = baseAddress + sizeOfImage;
 
@@ -73,16 +79,27 @@ namespace Memory {
                     break;
                 }
             }
-            if (match) return i;
+            if (match) {
+              if constexpr (std::is_same_v<T, uintptr_t>) {
+                return i;
+              } else {
+                result.push_back(i);
+              }
+            }   
         }
       }
       current = nextPage;
     }
-    return 0;
+    return result;
   }
 
   template <typename T> std::vector<T> ParseHexStringTo(const std::string& input) 
   {
+      static_assert(
+        std::is_same_v<T, int> || std::is_same_v<T, BYTE>,
+        "ParseHexStringTo<T>: T must be either std::vector<int> or std::vector<BYTE>"
+      );
+      
       std::string hex;
       hex.reserve(input.size());
       // Remove whitespace
@@ -168,6 +185,26 @@ int MemoryWrite(lua_State* L) {
 
 int MemoryFind(lua_State* L) {
     std::string patternStr = luaL_checkstring(L, 1);
+    std::string moduleName = {};
+    std::string matchMode  = "first";
+    if (lua_gettop(L) >= 2) {
+      if (lua_istable(L, 2)) {
+        lua_getfield(L, 2, "module");
+        if (lua_isstring(L, -1)) {
+            moduleName = lua_tostring(L, -1);
+        }
+        lua_pop(L, 1);
+
+        lua_getfield(L, 2, "match");
+        if (lua_isstring(L, -1)) {
+            matchMode = lua_tostring(L, -1);
+        }
+        lua_pop(L, 1);
+      } else if (lua_isstring(L, 2)) {
+        moduleName = lua_tostring(L, 2);
+      }
+    }
+
     std::vector<int> pattern = {};
     try {
         pattern = Memory::ParseHexStringTo<int>(patternStr);
@@ -180,8 +217,7 @@ int MemoryFind(lua_State* L) {
 
     MODULEINFO moduleInfo;
     try {
-      if (lua_gettop(L) >= 2 && lua_isstring(L, 2)) {
-        std::string moduleName = lua_tostring(L, 2);
+      if (!moduleName.empty()) {
         moduleInfo = Memory::GetModuleInfo(toWString(moduleName));
       } else {
         moduleInfo = Memory::GetModuleInfo();
@@ -193,23 +229,53 @@ int MemoryFind(lua_State* L) {
     } 
     
     uintptr_t baseAddress = reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll);
-    uintptr_t address = 0;
-    try {
-        address = Memory::FindPattern(baseAddress, moduleInfo.SizeOfImage, pattern);
-    } catch(const std::exception& error) {
+
+    try 
+    {
+        if (matchMode == "all" || matchMode == "last") {
+            auto matches = Memory::FindPattern<std::vector<uintptr_t>>(baseAddress, moduleInfo.SizeOfImage, pattern);
+            
+            if (matchMode == "last") {
+              if (matches.empty()) {
+                lua_pushinteger(L, 0);
+                lua_pushFailure(L, "ERR_WIN32_API", "No Pattern found");
+                return 2;
+              }
+              lua_pushinteger(L, matches.back());
+              lua_pushnil(L);
+              return 2;
+            }
+
+            lua_newtable(L);
+            if (matches.empty()) {
+                lua_pushFailure(L, "ERR_WIN32_API", "No Pattern found");
+                return 2;
+            }
+            int i = 1;
+            for (auto address : matches) {
+                lua_pushinteger(L, address);
+                lua_rawseti(L, -2, i++);
+            }
+            lua_pushnil(L);
+            return 2;
+        } else {
+          uintptr_t address = Memory::FindPattern<uintptr_t>(baseAddress, moduleInfo.SizeOfImage, pattern);
+          if (!address) {
+              lua_pushinteger(L, 0);
+              lua_pushFailure(L, "ERR_WIN32_API", "No Pattern found");
+              return 2;
+          }
+          lua_pushinteger(L, address);
+          lua_pushnil(L);
+          return 2;
+        }   
+    } 
+    catch(const std::exception& error) 
+    {
         lua_pushinteger(L, 0);
         lua_pushFailure(L, "ERR_WIN32_API", error.what());
         return 2;
-    }
-
-    if (!address) {
-        lua_pushinteger(L, 0);
-        lua_pushFailure(L, "ERR_WIN32_API", "No Pattern found");
-        return 2;
-    }
-    lua_pushinteger(L, address);
-    lua_pushnil(L);
-    return 2; 
+    } 
 }
 
 template <typename T> static T SafeRead(uintptr_t address) {

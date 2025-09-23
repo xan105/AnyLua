@@ -52,7 +52,7 @@ end
 Usage
 =====
 
-AnyLua will load `main.lua` relative to its own parent dir.<br />
+AnyLua will load `AnyLua.lua` relative to its own parent dir.<br />
 The path can be overriden with the env var `ANYLUA_FILEPATH`.
 
 AnyLua can be used either as 
@@ -284,17 +284,27 @@ local memory = require("memory")
 
   Ex: "90 90 90 90 90 90"
 
-- `Find(pattern: string, module?: string) address: number, Failure | nil`
+- `Find(pattern: string, options?: { module?: string, match?: string } | string) address: number | number[], Failure | nil`
 
   Find specified pattern hex string inside the process memory space and return its address.
 
   pattern: use `?` for wildcard, whitespace are ignored.
 
   Ex: `Find("AA ?? BB CC ?? ?? DD")`
+  
+  module: when specified, scan module memory region instead of process.
 
-  module: when specified, scan module memory region instead of process
-
+  Ex: `Find("48 8B ?? ?? ??", { module = "UnityPlayer.dll" })`
+  
+  If options is a string then module is assumed.
+  
   Ex: `Find("48 8B ?? ?? ??", "UnityPlayer.dll")`
+  
+  match: `first` | `all` | `last` 
+  
+  Return the first match (default), all matches, or the last match.
+  
+  Ex: `Find("48 8B ?? ?? ??", { match = "all" })`
 
 - `ReadAs(address: number, typeStr: string, length?: number = 256) number | string | nil, Failure | nil`
 
@@ -336,6 +346,23 @@ local process = require("process")
 - `SetDpiAwareness(awareness: string) void`
 
   Set process dpi awareness: `UNAWARE` | `SYSTEM` | `MONITOR` | `MONITORv2` | `GDISCALED`
+  
+- `SetExecutionState(stateFlags: string[]) Failure | nil`
+
+  > Enables an application to inform the system that it is in use, thereby preventing the system from entering sleep or turning off the display while the application is running.
+  
+  Set execution state flags: `CONTINUOUS` | `DISPLAY` | `SYSTEM`
+  
+  Example:
+  
+  ```lua
+  local process = require("process")
+  -- This will keep the system and display awake until reset
+  process.SetExecutionState({"CONTINUOUS", "DISPLAY", "SYSTEM"})
+
+  -- Restore to normal behavior
+  process.SetExecutionState({"CONTINUOUS"})
+  ```
 
 - `LoadLibrary(filename: string) bool, Failure | nil`
 

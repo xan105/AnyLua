@@ -18,11 +18,12 @@ extern "C" {
 #include <iterator>
 #include <cctype>
 #include <stdexcept>
+#include <type_traits>
 #include <psapi.h>
 
 namespace Memory {
   bool Patch(uintptr_t address, const std::vector<BYTE>& patch, HANDLE hProcess);
-  uintptr_t FindPattern(uintptr_t baseAddress, size_t sizeOfImage, const std::vector<int>& pattern);
+  template <typename T> T FindPattern(uintptr_t baseAddress, size_t sizeOfImage, const std::vector<int>& pattern);
   template <typename T> std::vector<T> ParseHexStringTo(const std::string& input);
   MODULEINFO GetModuleInfo(const std::wstring& moduleName);
 }
