@@ -59,8 +59,8 @@ jobs:
           # InputFusion
           New-Item -ItemType Directory -Path "$tmp\x64" | Out-Null
           New-Item -ItemType Directory -Path "$tmp\x86" | Out-Null
-          Copy-Item ".\build\AnyLua\output\x64\Release\AnyLua.dll" "$tmp\x64" -Force
-          Copy-Item ".\build\AnyLua\output\Win32\Release\AnyLua.dll" "$tmp\x86" -Force
+          Copy-Item ".\build\output\x64\Release\AnyLua.dll" "$tmp\x64" -Force
+          Copy-Item ".\build\output\Win32\Release\AnyLua.dll" "$tmp\x86" -Force
 
           # Example
           # TODO
